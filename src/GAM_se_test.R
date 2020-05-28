@@ -13,54 +13,8 @@ df <- d %>% subset(., select = c(clusterid, TS_t2, sex, laz_t3)) %>%
   filter(!is.na(Y) & !is.na(x)) %>%
   mutate(dummy=1)
 
-gamCI <- function(m,newdata,nreps=10000) {
-  require(mgcv)
-  require(dplyr)
-  Vb <- vcov(m,unconditional = TRUE)
-  pred <- predict(m, newdata, se.fit = TRUE)
-  fit <- pred$fit
-  se.fit <- pred$se.fit
-  BUdiff <- MASS::mvrnorm(n=nreps, mu = rep(0, nrow(Vb)), Sigma = Vb)
-  Cg <- predict(m, newdata, type = "lpmatrix")
-  simDev <- Cg %*% t(BUdiff)
-  absDev <- abs(sweep(simDev, 1, se.fit, FUN = "/"))
-  masd <- apply(absDev, 2L, max)
-  crit <- quantile(masd, prob = 0.95, type = 8)
-  pred <- data.frame(newdata,fit=pred$fit,se.fit=pred$se.fit)
-  pred <- mutate(pred,
-                 uprP = fit + (2 * se.fit),
-                 lwrP = fit - (2 * se.fit),
-                 uprS = fit + (crit * se.fit),
-                 lwrS = fit - (crit * se.fit)
-  )
-  return(pred)
-}
 
 
-
-
-gam_diffCI <- function(m,newdata,nreps=10000) {
-  require(mgcv)
-  require(dplyr)
-  Vb <- vcov(m,unconditional = TRUE)
-  pred <- predict(m, newdata, se.fit = TRUE)
-  fit <- pred$fit
-  se.fit <- pred$se.fit
-  BUdiff <- MASS::mvrnorm(n=nreps, mu = rep(0, nrow(Vb)), Sigma = Vb)
-  Cg <- predict(m, newdata, type = "lpmatrix")
-  simDev <- Cg %*% t(BUdiff)
-  absDev <- abs(sweep(simDev, 1, se.fit, FUN = "/"))
-  masd <- apply(absDev, 2L, max)
-  crit <- quantile(masd, prob = 0.95, type = 8)
-  pred <- data.frame(newdata,fit=pred$fit,se.fit=pred$se.fit)
-  pred <- mutate(pred,
-                 uprP = fit + (2 * se.fit),
-                 lwrP = fit - (2 * se.fit),
-                 uprS = fit + (crit * se.fit),
-                 lwrS = fit - (crit * se.fit)
-  )
-  return(pred)
-}
 
 
 

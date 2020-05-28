@@ -22,6 +22,8 @@ library(cowplot)
 library(mgcv)
 
 
+source(here("src/0-gam-functions.R"))
+
 dropboxDir <- NULL
 if(dir.exists("C:/Users/andre/Dropbox/WASHB-EE-analysis/WBB-EE-analysis/")){ 
   dropboxDir <- "C:/Users/andre/Dropbox/WASHB-EE-analysis/WBB-EE-analysis/"
