@@ -41,7 +41,10 @@ simul_plot$p
 # Tertiary Outcomes: Child WLZ at Year 1
 
 Xvars <- c("t2_f2_8ip_raw", "t2_f2_23d_raw", "t2_f2_VI_raw", "t2_f2_12i_raw")            
-Yvars <- c("laz_t2", "waz_t2", "whz_t2" ,"hcz_t2" )
+Yvars <- c("laz_t2", "waz_t2", "whz_t2" ,"hcz_t2", 
+           "len_velocity_t2_t3", "wei_velocity_t2_t3", "hc_velocity_t2_t3",
+           "laz_t3", "waz_t3", "whz_t3", "hcz_t3",
+           "delta_laz_t2_t3", "delta_waz_t2_t3", "delta_whz_t2_t3", "delta_hcz_t2_t3")
 
 #Fit models
 H1_models <- NULL
@@ -85,4 +88,3 @@ saveRDS(H1_plot_list, here("figure-objects/H1_unadj_splines.RDS"))
 
 #Save plot data
 saveRDS(H1_plot_data, here("figure-data/H1_unadj_spline_data.RDS"))
-
