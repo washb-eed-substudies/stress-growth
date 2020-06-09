@@ -30,15 +30,40 @@ simul_plot$p
 
 #Loop over exposure-outcome pairs
 
-#Hypothesis 1a
+##Hypothesis 1a
 #Urinary creatine-adjusted F2-isoprostanes isomer score  at Year 1 is negatively associated with 
 #concurrent child LAZ, WAZ, WLZ, and head circumference-for-age Z score at Year 1.
-
 
 # Exposure: Quartile of F2-isoprostanes isomer score
 # Primary Outcome  : Child LAZ at Year 1
 # Secondary Outcome: Child WAZ and head circumference-for-age Z score at Year 1
 # Tertiary Outcomes: Child WLZ at Year 1
+
+##Hypothesis 1b
+#Urinary creatine-adjusted F2-isoprostanes isomer score at Year 1 is negatively 
+#associated with child growth velocity (kg/month or cm/month) between the Year 1 and Year 2 visits.	
+
+#Exposure: Quartile of F2-isoprostanes isomer score
+#Primary Outcome: Child length velocity (in cm/month) from Year 1 to Year 2
+#Secondary Outcome: Child weight velocity (in kg/month) and head circumference velocity (in cm/month) from Year 1 to Year 2
+
+## Hypothesis 1c
+#Urinary creatine-adjusted F2-isoprostanes isomer score at Year 1 is negatively 
+#associated with subsequent child LAZ, WAZ, WLZ, and head circumference-for-age Z score at Year 2. 
+
+#Exposure: Quartile of F2-isoprostanes isomer score
+#Primary Outcome: Child LAZ at Year 2
+#Secondary Outcome: Child WAZ and head circumference-for-age Z score at Year 2
+#Tertiary Outcome: Child WLZ at Year 2
+
+##Hypothesis 1d
+#Urinary creatine-adjusted F2-isoprostanes isomer score at Year 1 is negatively 
+#associated with the change in child LAZ, WAZ, WLZ, and head circumference-for-age Z score from Year 1 to Year 2. 
+
+#Exposure: Quartiles of F2-isoprostanes isomer score
+#Primary Outcome: Change in child LAZ from Year 1 to Year 2
+#Secondary Outcome: Change in child WAZ and head circumference-for-age Z score from Year 1 to Year 2
+#Tertiary Outcomes: Change in child WLZ from Year 1 to Year 2
 
 Xvars <- c("t2_f2_8ip_raw", "t2_f2_23d_raw", "t2_f2_VI_raw", "t2_f2_12i_raw")            
 Yvars <- c("laz_t2", "waz_t2", "whz_t2" ,"hcz_t2", 
@@ -88,3 +113,154 @@ saveRDS(H1_plot_list, here("figure-objects/H1_unadj_splines.RDS"))
 
 #Save plot data
 saveRDS(H1_plot_data, here("figure-data/H1_unadj_spline_data.RDS"))
+
+
+
+## Hypothesis 2a
+#Change in slope between pre- and post-stressor cortisol measured at Year 2 is positively associated 
+#with concurrent child LAZ, WAZ, WLZ, and head circumference-for-age Z score at Year 2.
+
+#Exposure: Quartiles of pre- and post-stressor cortisol at Year 2
+#Primary Outcome: Child LAZ at Year 2
+#Secondary Outcome: Child WAZ and head circumference-for-age Z score at Year 2
+#Tertiary Outcome: Child WLZ at Year 2
+
+##Hypothesis 2b
+#Residualized gain score for cortisol measured at Year 2 is positively associated 
+#with concurrent child LAZ, WAZ, WLZ, and head circumference-for-age Z score at Year 2.
+
+#Exposure: Quartiles of pre- and post-stressor cortisol at Year 2
+#Primary Outcome: Child LAZ at Year 2
+#Secondary Outcome: Child WAZ and head circumference-for-age Z score at Year 2
+#Tertiary Outcomes: Child WLZ at Year 2
+
+##Hypothesis 2c
+#Change in slope between pre- and post-stressor alpha-amylase measured at Year 2 is negatively associated 
+#with concurrent child LAZ, WAZ, WLZ, and head circumference-for-age Z score at Year 2.
+
+#Exposure: Quartiles of pre- and post-stressor alpha-amylase at Year 2
+#Primary Outcome: Child LAZ at Year 2
+#Secondary Outcome: Child WAZ and head circumference-for-age Z score at Year 2
+#Tertiary Outcome: Child WLZ at Year 2
+
+##Hypothesis 2d
+#Residualized gain score for alpha-amylase measured at Year 2 is negatively associated 
+#with concurrent child LAZ, WAZ, WLZ, and head circumference-for-age Z score at Year 2.
+
+#Exposure: Quartiles of pre- and post-stressor alpha-amylase at Year 2
+#Primary Outcome: Child LAZ at Year 2
+#Secondary Outcome: Child WAZ and head circumference-for-age Z score at Year 2
+#Tertiary Outcome: Child WLZ at Year 2
+
+Xvars <- c("t3_cort_slope", "t3_residual_cort", "t3_saa_slope", "t3_residual_saa")            
+Yvars <- c("laz_t3", "waz_t3", "whz_t3", "hcz_t3")
+
+#Fit models
+H2_models <- NULL
+for(i in Xvars){
+  for(j in Yvars){
+    res_unadj <- fit_RE_gam(d=d, X=i, Y=j,  W=NULL)
+    res <- data.frame(X=i, Y=j, fit=I(list(res_unadj$fit)), dat=I(list(res_unadj$dat)))
+    H2_models <- bind_rows(H2_models, res)
+  }
+}
+
+#Get primary contrasts
+H2_res <- NULL
+for(i in 1:nrow(H2_models)){
+  res <- data.frame(X=H2_models$X[i], Y=H2_models$Y[i])
+  preds <- predict_gam_diff(fit=H2_models$fit[i][[1]], d=H2_models$dat[i][[1]], quantile_diff=c(0.25,0.75), Xvar=res$X, Yvar=res$Y)
+  H2_res <-  bind_rows(H2_res , preds$res)
+}
+H2_res$adjusted <- 0
+
+#Make list of plots
+H2_plot_list <- NULL
+H2_plot_data <- NULL
+for(i in 1:nrow(H2_models)){
+  res <- data.frame(X=H2_models$X[i], Y=H2_models$Y[i])
+  simul_plot <- gam_simul_CI(H2_models$fit[i][[1]], H2_models$dat[i][[1]], xlab=res$X, ylab=res$Y, title="")
+  H2_plot_list[[i]] <-  simul_plot$p
+  H2_plot_data <-  rbind(H2_plot_data, data.frame(Xvar=res$X, Yvar=res$Y, adj=0, simul_plot$pred))
+}
+
+
+#Save models
+saveRDS(H2_models, here("models/H2_models.RDS"))
+
+#Save results
+saveRDS(H2_res, here("results/unadjusted/H2_res.RDS"))
+
+
+#Save plots
+saveRDS(H2_plot_list, here("figure-objects/H2_unadj_splines.RDS"))
+
+#Save plot data
+saveRDS(H2_plot_data, here("figure-data/H2_unadj_spline_data.RDS"))
+
+
+
+##Hypothesis 3a
+#Mean arterial pressure measured at Year 2 is negatively associated with concurrent 
+#child LAZ, WAZ, WLZ, and head circumference-for-age Z score at Year 2.
+
+#Exposure: Quartiles of mean arterial pressure at Year 2
+#Primary Outcome: Child LAZ at Year 2
+#Secondary Outcome: Child WAZ and head circumference-for-age Z score at Year 2
+#Tertiary Outcomes: Child WLZ at Year 2
+
+##Hypothesis 3b
+#Resting heart rate measured at Year 2 is negatively associated with concurrent 
+#child LAZ, WAZ, WLZ, and head circumference-for-age Z score at Year 2.
+
+#Exposure: Quartiles of resting heart rate at Year 2
+#Primary Outcome: Child LAZ at Year 2
+#Secondary Outcome: Child WAZ and head circumference-for-age Z score at Year 2
+#Tertiary Outcomes: Child WLZ at Year 2
+
+Xvars <- c("t3_map", "t3_hr_mean")            
+Yvars <- c("laz_t3", "waz_t3", "whz_t3", "hcz_t3")
+
+#Fit models
+H3_models <- NULL
+for(i in Xvars){
+  for(j in Yvars){
+    res_unadj <- fit_RE_gam(d=d, X=i, Y=j,  W=NULL)
+    res <- data.frame(X=i, Y=j, fit=I(list(res_unadj$fit)), dat=I(list(res_unadj$dat)))
+    H3_models <- bind_rows(H3_models, res)
+  }
+}
+
+#Get primary contrasts
+H3_res <- NULL
+for(i in 1:nrow(H3_models)){
+  res <- data.frame(X=H3_models$X[i], Y=H3_models$Y[i])
+  preds <- predict_gam_diff(fit=H3_models$fit[i][[1]], d=H3_models$dat[i][[1]], quantile_diff=c(0.25,0.75), Xvar=res$X, Yvar=res$Y)
+  H3_res <-  bind_rows(H3_res , preds$res)
+}
+H3_res$adjusted <- 0
+
+#Make list of plots
+H3_plot_list <- NULL
+H3_plot_data <- NULL
+for(i in 1:nrow(H3_models)){
+  res <- data.frame(X=H3_models$X[i], Y=H3_models$Y[i])
+  simul_plot <- gam_simul_CI(H3_models$fit[i][[1]], H3_models$dat[i][[1]], xlab=res$X, ylab=res$Y, title="")
+  H3_plot_list[[i]] <-  simul_plot$p
+  H3_plot_data <-  rbind(H3_plot_data, data.frame(Xvar=res$X, Yvar=res$Y, adj=0, simul_plot$pred))
+}
+
+
+#Save models
+saveRDS(H3_models, here("models/H3_models.RDS"))
+
+#Save results
+saveRDS(H3_res, here("results/unadjusted/H3_res.RDS"))
+
+
+#Save plots
+saveRDS(H3_plot_list, here("figure-objects/H3_unadj_splines.RDS"))
+
+#Save plot data
+saveRDS(H3_plot_data, here("figure-data/H3_unadj_spline_data.RDS"))
+
