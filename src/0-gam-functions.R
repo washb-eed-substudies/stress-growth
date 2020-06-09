@@ -166,8 +166,8 @@ predict_gam_diff <- function(fit, d, quantile_diff=c(0.25,0.75), Xvar, Yvar){
   #Make sure subset has overall quantiles within it
   q1 <- unname(quantile(d$X,quantile_diff[1]))
   q3 <- unname(quantile(d$X,quantile_diff[2]))
-  q1_pos <- which(abs(d$X- q1)==min(abs(d$X- q1)))
-  q3_pos <- which(abs(d$X- q3)==min(abs(d$X- q3)))
+  q1_pos <- which(abs(d$X- q1)==min(abs(d$X- q1)))[1]
+  q3_pos <- which(abs(d$X- q3)==min(abs(d$X- q3)))[1]
   d$X[q1_pos] <- q1
   d$X[q3_pos] <- q3
   
