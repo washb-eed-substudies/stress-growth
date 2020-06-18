@@ -264,3 +264,68 @@ saveRDS(H3_plot_list, here("figure-objects/H3_unadj_splines.RDS"))
 #Save plot data
 saveRDS(H3_plot_data, here("figure-data/H3_unadj_spline_data.RDS"))
 
+
+##Hypothesis 4a
+#Glucocorticoid receptor (NR3C1) exon 1F promoter methylation in saliva samples at Year 2 
+#is negatively associated with concurrent child LAZ, WAZ, WLZ, and head circumference-for-age Z score at Year 2.
+
+#Exposure: Quartiles of overall percentage of methylation across the entire promoter region at Year 2 post-intervention
+#Primary Outcome: Child LAZ at Year 2
+#Secondary Outcome: Child WAZ and head circumference-for-age Z score at Year 2
+#Tertiary Outcomes: Child WLZ at Year 2
+
+##Hypothesis 4b
+#Glucocorticoid receptor NGFI-A transcription factor binding site methylation in saliva samples at Year 2 
+#is negatively associated with concurrent child LAZ, WAZ, WLZ, and head circumference-for-age Z score at Year 2.
+
+#Exposure: Quartiles of percentage methylation at NGFI-A transcription factor binding 	site (CpG site #12)
+#Primary Outcome: Child LAZ at Year 2
+#Secondary Outcome: Child WAZ and head circumference-for-age Z score at Year 2
+#Tertiary Outcomes: Child WLZ at Year 2
+                                                                                            
+Xvars <- c("t3_gcr_mean_raw", "t3_gcr_cpg12_raw")            
+Yvars <- c("laz_t3", "waz_t3", "whz_t3", "hcz_t3")
+
+#Fit models
+H4_models <- NULL
+for(i in Xvars){
+  for(j in Yvars){
+    res_unadj <- fit_RE_gam(d=d, X=i, Y=j,  W=NULL)
+    res <- data.frame(X=i, Y=j, fit=I(list(res_unadj$fit)), dat=I(list(res_unadj$dat)))
+    H4_models <- bind_rows(H4_models, res)
+  }
+}
+
+#Get primary contrasts
+H4_res <- NULL
+for(i in 1:nrow(H4_models)){
+  res <- data.frame(X=H4_models$X[i], Y=H4_models$Y[i])
+  preds <- predict_gam_diff(fit=H4_models$fit[i][[1]], d=H4_models$dat[i][[1]], quantile_diff=c(0.25,0.75), Xvar=res$X, Yvar=res$Y)
+  H4_res <-  bind_rows(H4_res , preds$res)
+}
+H4_res$adjusted <- 0
+
+#Make list of plots
+H4_plot_list <- NULL
+H4_plot_data <- NULL
+for(i in 1:nrow(H4_models)){
+  res <- data.frame(X=H4_models$X[i], Y=H4_models$Y[i])
+  simul_plot <- gam_simul_CI(H4_models$fit[i][[1]], H4_models$dat[i][[1]], xlab=res$X, ylab=res$Y, title="")
+  H4_plot_list[[i]] <-  simul_plot$p
+  H4_plot_data <-  rbind(H4_plot_data, data.frame(Xvar=res$X, Yvar=res$Y, adj=0, simul_plot$pred))
+}
+
+
+#Save models
+saveRDS(H4_models, here("models/H4_models.RDS"))
+
+#Save results
+saveRDS(H4_res, here("results/unadjusted/H4_res.RDS"))
+
+
+#Save plots
+saveRDS(H4_plot_list, here("figure-objects/H4_unadj_splines.RDS"))
+
+#Save plot data
+saveRDS(H4_plot_data, here("figure-data/H4_unadj_spline_data.RDS"))
+
