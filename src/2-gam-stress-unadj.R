@@ -11,7 +11,7 @@ d<-read.csv(paste0(dropboxDir, "Data/Cleaned/Audrie/bangladesh-dm-ee-stress-grow
 #Example:
 
 #Fit GAM model with random effects for childid
-res_unadj <- fit_RE_gam(d=d, X="t3_cort_z01_raw", Y="laz_t3",  W=NULL)
+res_unadj <- fit_RE_gam(d=d, X="t3_cort_z01", Y="laz_t3",  W=NULL)
 
 #Get predictions of differences from the 25th percentile of exposure
 preds_unadj <- predict_gam_diff(fit=res_unadj$fit, d=res_unadj$dat, quantile_diff=c(0.25,0.75), Xvar="delta_TS", Yvar="laz_t3")
@@ -67,7 +67,7 @@ simul_plot$p
 #Secondary Outcome: Change in child WAZ and head circumference-for-age Z score from Year 1 to Year 2
 #Tertiary Outcomes: Change in child WLZ from Year 1 to Year 2
 
-Xvars <- c("t2_f2_8ip_raw", "t2_f2_23d_raw", "t2_f2_VI_raw", "t2_f2_12i_raw")            
+Xvars <- c("t2_f2_8ip", "t2_f2_23d", "t2_f2_VI", "t2_f2_12i")            
 Yvars <- c("laz_t2", "waz_t2", "whz_t2" ,"hcz_t2", 
            "len_velocity_t2_t3", "wei_velocity_t2_t3", "hc_velocity_t2_t3",
            "laz_t3", "waz_t3", "whz_t3", "hcz_t3",
@@ -285,7 +285,7 @@ saveRDS(H3_plot_data, here("figure-data/H3_unadj_spline_data.RDS"))
 #Secondary Outcome: Child WAZ and head circumference-for-age Z score at Year 2
 #Tertiary Outcomes: Child WLZ at Year 2
                                                                                             
-Xvars <- c("t3_gcr_mean_raw", "t3_gcr_cpg12_raw")            
+Xvars <- c("t3_gcr_mean", "t3_gcr_cpg12")            
 Yvars <- c("laz_t3", "waz_t3", "whz_t3", "hcz_t3")
 
 #Fit models
