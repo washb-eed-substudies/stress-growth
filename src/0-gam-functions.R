@@ -273,6 +273,18 @@ gam_simul_CI <- function(m,newdata,nreps=10000, xlab="", ylab="", title="") {
   
   newdata <- newdata %>% mutate(dummy=0)
   
+  Wvars <- colnames(newdata)[!(colnames(newdata) %in% c("Y","X" ,"id" ,"dummy"))]
+  #set covariates to the median/mode
+  for(i in Wvars){
+    if(class(newdata[,i])=="character"|class(newdata[,i])=="factor"){
+      newdata[,i] <- Mode(newdata[,i])
+    }else{
+      newdata[,i] <- median(newdata[,i])
+    }
+  }
+  
+  newdata <- newdata[order(newdata$X),]
+  
   Vb <- vcov(m,unconditional = TRUE)
   pred <- predict(m, newdata, se.fit = TRUE)
   fit <- pred$fit
