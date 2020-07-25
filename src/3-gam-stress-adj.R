@@ -4,7 +4,7 @@ rm(list=ls())
 source(here::here("0-config.R"))
 source(here::here("src/0-gam-functions.R"))
 
-d <- read.csv(paste0(dropboxDir,"Data/Cleaned/Audrie/bangladesh-dm-ee-stress-growth-covariates-stresslab-anthro.csv"))
+d <- read.csv(paste0(dropboxDir,"/Data/Cleaned/Audrie/bangladesh-dm-ee-stress-growth-covariates-stresslab-anthro.csv"))
 
 #Set list of adjustment variables
 #Make vectors of adjustment variable names
@@ -144,17 +144,17 @@ for(i in 1:nrow(H1_adj_models)){
 
 
 #Save models
-saveRDS(H1_adj_models, here("models/H1_adj_models.RDS"))
+saveRDS(H1_adj_models, paste0(dropboxDir,"results/stress-growth-models/models/H1_adj_models.RDS"))
 
 #Save results
 saveRDS(H1_adj_res, here("results/adjusted/H1_adj_res.RDS"))
 
 
 #Save plots
-saveRDS(H1_adj_plot_list, here("figure-objects/H1_adj_splines.RDS"))
+saveRDS(H1_adj_plot_list, paste0(dropboxDir,"results/stress-growth-models/figure-objects/H1_adj_splines.RDS"))
 
 #Save plot data
-saveRDS(H1_adj_plot_data, here("figure-data/H1_adj_spline_data.RDS"))
+saveRDS(H1_adj_plot_data, paste0(dropboxDir,"results/stress-growth-models/figure-data/H1_adj_spline_data.RDS"))
 
 
 ## Hypothesis 2a
@@ -227,17 +227,17 @@ for(i in 1:nrow(H2_adj_models)){
 
 
 #Save models
-saveRDS(H2_adj_models, here("models/H2_adj_models.RDS"))
+saveRDS(H2_adj_models, paste0(dropboxDir,"results/stress-growth-models/models/H2_adj_models.RDS"))
 
 #Save results
 saveRDS(H2_adj_res, here("results/adjusted/H2_adj_res.RDS"))
 
 
 #Save plots
-saveRDS(H2_adj_plot_list, here("figure-objects/H2_adj_splines.RDS"))
+saveRDS(H2_adj_plot_list, paste0(dropboxDir,"results/stress-growth-models/figure-objects/H2_adj_splines.RDS"))
 
 #Save plot data
-saveRDS(H2_adj_plot_data, here("figure-data/H2_adj_spline_data.RDS"))
+saveRDS(H2_adj_plot_data, paste0(dropboxDir,"results/stress-growth-models/figure-data/H2_adj_spline_data.RDS"))
 
 
 ##Hypothesis 3a
@@ -292,17 +292,17 @@ for(i in 1:nrow(H3_adj_models)){
 
 
 #Save models
-saveRDS(H3_adj_models, here("models/H3_adj_models.RDS"))
+saveRDS(H3_adj_models, paste0(dropboxDir,"results/stress-growth-models/models/H3_adj_models.RDS"))
 
 #Save results
 saveRDS(H3_adj_res, here("results/adjusted/H3_adj_res.RDS"))
 
 
 #Save plots
-saveRDS(H3_adj_plot_list, here("figure-objects/H3_adj_splines.RDS"))
+saveRDS(H3_adj_plot_list, paste0(dropboxDir,"results/stress-growth-models/figure-objects/H3_adj_splines.RDS"))
 
 #Save plot data
-saveRDS(H3_adj_plot_data, here("figure-data/H3_adj_spline_data.RDS"))
+saveRDS(H3_adj_plot_data, paste0(dropboxDir,"results/stress-growth-models/figure-data/H3_adj_spline_data.RDS"))
 
 
 ##Hypothesis 4a
@@ -357,17 +357,17 @@ for(i in 1:nrow(H4_adj_models)){
 
 
 #Save models
-saveRDS(H4_adj_models, here("models/H4_adj_models.RDS"))
+saveRDS(H4_adj_models, paste0(dropboxDir,"results/stress-growth-models/models/H4_adj_models.RDS"))
 
 #Save results
 saveRDS(H4_adj_res, here("results/adjusted/H4_adj_res.RDS"))
 
 
 #Save plots
-saveRDS(H4_adj_plot_list, here("figure-objects/H4_adj_splines.RDS"))
+saveRDS(H4_adj_plot_list, paste0(dropboxDir,"results/stress-growth-models/figure-objects/H4_adj_splines.RDS"))
 
 #Save plot data
-saveRDS(H4_adj_plot_data, here("figure-data/H4_adj_spline_data.RDS"))
+saveRDS(H4_adj_plot_data, paste0(dropboxDir,"results/stress-growth-models/figure-data/H4_adj_spline_data.RDS"))
 
 ## Hypothesis 2a
 #Change in slope between pre- and post-stressor cortisol measured at Year 2 is positively associated 
@@ -444,17 +444,17 @@ for(i in 1:nrow(H2_models)){
 
 
 #Save models
-saveRDS(H2_models, here("models/adj_H2_models.RDS"))
+saveRDS(H2_models, paste0(dropboxDir,"results/stress-growth-models/models/adj_H2_models.RDS"))
 
 #Save results
 saveRDS(H2_res, here("results/adjusted/H2_res.RDS"))
 
 
 #Save plots
-saveRDS(H2_plot_list, here("figure-objects/H2_adj_splines.RDS"))
+saveRDS(H2_plot_list, paste0(dropboxDir,"results/stress-growth-models/figure-objects/H2_adj_splines.RDS"))
 
 #Save plot data
-saveRDS(H2_plot_data, here("figure-data/H2_adj_spline_data.RDS"))
+saveRDS(H2_plot_data, paste0(dropboxDir,"results/stress-growth-models/figure-data/H2_adj_spline_data.RDS"))
 
 
 
@@ -511,17 +511,17 @@ for(i in 1:nrow(H3_models)){
 
 
 #Save models
-saveRDS(H3_models, here("models/adj_H3_models.RDS"))
+saveRDS(H3_models, paste0(dropboxDir,"results/stress-growth-models/models/adj_H3_models.RDS"))
 
 #Save results
-saveRDS(H3_res, here("results/adjusted/H3_res.RDS"))
+saveRDS(H3_res, here("results/adjusted/H3_adj_res.RDS"))
 
 
 #Save plots
-saveRDS(H3_plot_list, here("figure-objects/H3_adj_splines.RDS"))
+saveRDS(H3_plot_list, paste0(dropboxDir,"results/stress-growth-models/figure-objects/H3_adj_splines.RDS"))
 
 #Save plot data
-saveRDS(H3_plot_data, here("figure-data/H3_adj_spline_data.RDS"))
+saveRDS(H3_plot_data, paste0(dropboxDir,"results/stress-growth-models/figure-data/H3_adj_spline_data.RDS"))
 
 
 ##Hypothesis 4a
@@ -580,14 +580,14 @@ for(i in 1:nrow(H4_models)){
 
 
 #Save models
-saveRDS(H4_models, here("models/adj_H4_models.RDS"))
+saveRDS(H4_models, paste0(dropboxDir,"results/stress-growth-models/models/adj_H4_models.RDS"))
 
 #Save results
-saveRDS(H4_res, here("results/adjusted/H4_res.RDS"))
+saveRDS(H4_res, here("results/adjusted/H4_adj_res.RDS"))
 
 
 #Save plots
-saveRDS(H4_plot_list, here("figure-objects/H4_adj_splines.RDS"))
+saveRDS(H4_plot_list, paste0(dropboxDir,"results/stress-growth-models/figure-objects/H4_adj_splines.RDS"))
 
 #Save plot data
-saveRDS(H4_plot_data, here("figure-data/H4_adj_spline_data.RDS"))
+saveRDS(H4_plot_data, paste0(dropboxDir,"results/stress-growth-models/figure-data/H4_adj_spline_data.RDS"))
