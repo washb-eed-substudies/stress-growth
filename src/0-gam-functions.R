@@ -92,7 +92,7 @@ fit_RE_gam <- function(d, Y, X, W=NULL, V=NULL, id="clusterid", family = "gaussi
   
   d$dummy<-1
 
-  if(!is.null(W)){
+  if(!is.null(W) & length(Wscreen)>0){
     
     #Make formula for adjusted model
     Ws <- subset(gamdat, select = c(Wscreen))
@@ -114,15 +114,26 @@ fit_RE_gam <- function(d, Y, X, W=NULL, V=NULL, id="clusterid", family = "gaussi
     W_continious <- W_numeric[!indicator_vec]
     
     #Create GAM equation
-    eq_fact <- paste0("s(", W_continious, ", bs=\"cr\")", collapse=" + ")
-    eq_num <- paste0(" + ",paste0(c(W_factors,W_indicator), collapse=" + "))
-    
+    if(length(W_continious)>0){
+      eq_num <- paste0("s(", W_continious, ", bs=\"cr\")", collapse=" + ")
+    }else{
+      eq_num=NULL
+    }
+    if(length(W_factors)+length(W_indicator)>0){
+    eq_fact <- paste0(" + ",paste0(c(W_factors,W_indicator), collapse=" + "))
+    }else{
+      eq_fact=NULL
+    }
     #fit model
    
     if(!is.null(V)){
-      equation <- as.formula(paste0("Y~s(X, bs=\"cr\")+ V + X*V +",eq_fact,eq_num,"+ s(id,bs=\"re\",by=dummy)"))
+      form <- paste0("Y~s(X, bs=\"cr\")+",eq_fact," +",eq_num,"+ s(id,bs=\"re\",by=dummy)")
+      form <- gsub("+ +","+",form, fixed=TRUE)
+      equation <- as.formula(form)
     }else{
-      equation <- as.formula(paste0("Y~s(X, bs=\"cr\")+",eq_fact,eq_num,"+ s(id,bs=\"re\",by=dummy)"))
+      form <- paste0("Y~s(X, bs=\"cr\")+",eq_fact," +",eq_num,"+ s(id,bs=\"re\",by=dummy)")
+      form <- gsub("+ +","+",form, fixed=TRUE)
+      equation <- as.formula(form)
     }
     
     fit <- mgcv::gam(formula = equation,data=d)
@@ -263,6 +274,12 @@ predict_gam_int <- function(fit, d, quantile_diff=c(0.25,0.75), Xvar, Yvar){
 
 
 
+# m=H2_models$fit[i][[1]]
+# newdata=H2_models$dat[i][[1]]
+# 
+# xlab=res$X
+# ylab=res$Y
+# title=""
 
 
 
@@ -272,6 +289,18 @@ gam_simul_CI <- function(m,newdata,nreps=10000, xlab="", ylab="", title="") {
   require(dplyr)
   
   newdata <- newdata %>% mutate(dummy=0)
+  
+  Wvars <- colnames(newdata)[!(colnames(newdata) %in% c("Y","X" ,"id" ,"dummy"))]
+  #set covariates to the median/mode
+  for(i in Wvars){
+    if(class(newdata[,i])=="character"|class(newdata[,i])=="factor"){
+      newdata[,i] <- Mode(newdata[,i])
+    }else{
+      newdata[,i] <- median(newdata[,i])
+    }
+  }
+  
+  newdata <- newdata[order(newdata$X),]
   
   Vb <- vcov(m,unconditional = TRUE)
   pred <- predict(m, newdata, se.fit = TRUE)

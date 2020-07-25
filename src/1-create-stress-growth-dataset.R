@@ -7,11 +7,11 @@ source(here::here("0-config.R"))
 stress <- readRDS(paste0(dropboxDir,"Data/Cleaned/Andrew/clean_stress_dataset_andrew.RDS"))
 
 anthro <- read.csv("C:/Users/andre/Dropbox/WASHB-Bangladesh-Data/1-primary-outcome-datasets/washb-bangladesh-anthro.csv")
-anthro <
 
 load(paste0(dropboxDir, "Data/Cleaned/Audrie/bangladesh-dm-ee-telo-growth-covariates-telolab-anthro.RData"))
 
 d$dataid <- as.numeric(d$dataid)
+d <- d %>% subset(., select = -c(sex))
 df <- left_join(stress, d, by = c("childid", "dataid", "clusterid"))
   
 head(df)

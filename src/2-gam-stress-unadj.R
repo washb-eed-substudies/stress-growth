@@ -1,10 +1,7 @@
 rm(list=ls())
-
+ 
 source(here::here("0-config.R"))
 source(here::here("src/0-gam-functions.R"))
-
-#d <- readRDS(paste0(dropboxDir,"Data/Cleaned/Andrew/stress_growth_data.RDS"))
-#d <- d %>% subset(., select = -c(X))
 
 d<-read.csv(paste0(dropboxDir, "Data/Cleaned/Audrie/bangladesh-dm-ee-stress-growth-covariates-stresslab-anthro.csv"))
 
