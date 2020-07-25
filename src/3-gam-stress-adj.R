@@ -108,9 +108,6 @@ pick_covariates_H1 <- function(j){
   if(grepl("_t3", j)){Wset = W2_F2.W3_anthro}
   return(Wset)
 }
-
-
-
 #Fit models
 H1_adj_models <- NULL
 for(i in Xvars){
@@ -123,6 +120,7 @@ for(i in Xvars){
     H1_adj_models <- bind_rows(H1_adj_models, res)
   }
 }
+
 
 
 #Get primary contrasts
@@ -371,7 +369,6 @@ saveRDS(H4_adj_plot_list, here("figure-objects/H4_adj_splines.RDS"))
 #Save plot data
 saveRDS(H4_adj_plot_data, here("figure-data/H4_adj_spline_data.RDS"))
 
-
 ## Hypothesis 2a
 #Change in slope between pre- and post-stressor cortisol measured at Year 2 is positively associated 
 #with concurrent child LAZ, WAZ, WLZ, and head circumference-for-age Z score at Year 2.
@@ -594,7 +591,3 @@ saveRDS(H4_plot_list, here("figure-objects/H4_adj_splines.RDS"))
 
 #Save plot data
 saveRDS(H4_plot_data, here("figure-data/H4_adj_spline_data.RDS"))
-
-
-
-
