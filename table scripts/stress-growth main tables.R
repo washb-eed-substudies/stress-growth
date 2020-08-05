@@ -1,5 +1,7 @@
 rm(list=ls())
 
+library('flextable')
+library('officer')
 source(here::here("0-config.R"))
 
 # load enrollment characteristics and results
@@ -56,21 +58,92 @@ write.csv(tbl1, file=here("tables/main/stress-growth-table1.csv"))
 
 
 #### Functions for tables 2-4 ####
-growth_tbl <- function(exposure, outcome, results, results_adj){
+
+growth_tbl <- function(name, expo_var, out_var, exposure, outcome, results, results_adj){
+  ### name: string name of group of exposures
+  ### expo_var: vector of string exposures to include in table
+  ### out_var: vector of string outcomes to include in table
+  ### exposure: vector of string exposure variable names
+  ### outcome: vector of string outcome variable names
+  ### results: data frame with unadjusted results
+  ### results_adj: data fram with adjusted results
+  
+  ### this function produces a table that can be saved as a csv
+  
   tbl <- data.table(" " = character(), " " = character(), " " = character(), " " = character(),
                     " Outcome, Q3 v. Q1" = character(), " " = character(), " " = character(), " " = character())
   tbl <- rbind(tbl, list(" ", " ", " ", " ", "Unadjusted", " ", "Fully adjusted", " "))
   tbl <- rbind(tbl, list(" ", "Outcome", "Q1 Mean", "Q3 Mean", "Coefficient (95% CI)", "P-value", "Coefficient (95% CI)", "P-value"))
-  for (exp in exposure) {
-    for (out in outcome) {
+  for (i in 1:length(exposure)) {
+    for (j in 1:length(outcome)) {
+      exp <- exposure[i]
+      out <- outcome[j]
       filtered_res <- results[results$Y==out & results$X==exp,]
       filtered_adj <- results_adj[results_adj$Y==out & results_adj$X==exp,]
       unadj <- paste(round(filtered_res$`point.diff`, 2), " (", round(filtered_res$`lb.diff`, 2), ", ", round(filtered_res$`ub.diff`, 2), ")", sep="")
       adj <- paste(round(filtered_adj$`point.diff`, 2), " (", round(filtered_adj$`lb.diff`, 2), ", ", round(filtered_adj$`ub.diff`, 2), ")", sep="")
-      tbl <- rbind(tbl, list(exp, out, round(filtered_res$q1, 2), round(filtered_res$q3, 2), unadj, round(filtered_res$Pval, 2), adj, round(filtered_adj$Pval, 2)))
+      if (j==1){
+        tbl <- rbind(tbl, list(expo_var[i], out_var[j], round(filtered_res$q1, 2), round(filtered_res$q3, 2), unadj, round(filtered_res$Pval, 2), adj, round(filtered_adj$Pval, 2)))
+      }else {
+        tbl <- rbind(tbl, list("", out_var[j], round(filtered_res$q1, 2), round(filtered_res$q3, 2), unadj, round(filtered_res$Pval, 2), adj, round(filtered_adj$Pval, 2)))
+      }
+    }
+    if (i != length(exposure)) {
+      tbl <- rbind(tbl, list("","","","","","","",""))
     }
   }
   tbl
+}
+
+growth_tbl_flex <- function(name, expo_var, out_var, exposure, outcome, results, results_adj){
+  ### name: string name of group of exposures
+  ### expo_var: vector of string exposures to include in table
+  ### out_var: vector of string outcomes to include in table
+  ### exposure: vector of string exposure variable names
+  ### outcome: vector of string outcome variable names
+  ### results: data frame with unadjusted results
+  ### results_adj: data fram with adjusted results
+  
+  ### this function produces a table that can be saved as an image or 
+  ### directly to a word document!
+  
+  # build table
+  tbl <- data.table(matrix(nrow=0, ncol=8))
+  for (i in 1:length(exposure)) {
+    for (j in 1:length(outcome)) {
+      exp <- exposure[i]
+      out <- outcome[j]
+      filtered_res <- results[results$Y==out & results$X==exp,]
+      filtered_adj <- results_adj[results_adj$Y==out & results_adj$X==exp,]
+      unadj <- paste(round(filtered_res$`point.diff`, 2), " (", round(filtered_res$`lb.diff`, 2), ", ", round(filtered_res$`ub.diff`, 2), ")", sep="")
+      adj <- paste(round(filtered_adj$`point.diff`, 2), " (", round(filtered_adj$`lb.diff`, 2), ", ", round(filtered_adj$`ub.diff`, 2), ")", sep="")
+      if (j==1){
+        tbl <- rbind(tbl, list(expo_var[i], out_var[j], round(filtered_res$q1, 2), round(filtered_res$q3, 2), unadj, round(filtered_res$Pval, 2), adj, round(filtered_adj$Pval, 2)))
+      }else {
+        tbl <- rbind(tbl, list("", out_var[j], round(filtered_res$q1, 2), round(filtered_res$q3, 2), unadj, round(filtered_res$Pval, 2), adj, round(filtered_adj$Pval, 2)))
+      }
+    }
+    if (i != length(exposure)) {
+      tbl <- rbind(tbl, list("","","","","","","",""))
+    }
+  }
+  
+  # format for export
+  flextbl<-flextable(tbl, col_keys=names(tbl))
+  flextbl <- set_header_labels(flextbl,
+                               values = list("V1" = name, "V2" = "Outcome", "V3" = "Q1 Mean", "V4" = "Q3 Mean",
+                                             "V5" = "Coefficient (95% CI)", "V6" = "P-value",
+                                             "V7" = "Coefficient (95% CI)", "V8" = "P-value"))
+  flextbl <- add_header_row(flextbl, values = c("","","","", "Unadjusted", "Fully adjusted"), colwidths=c(1,1,1,1,2,2))
+  flextbl <- hline_top(flextbl, part="header", border=fp_border(color="black", width = 2))
+  flextbl <- add_header_row(flextbl, values = c("","","","", "Outcome, Q3 v. Q1"), colwidths=c(1,1,1,1,4))
+  flextbl <- hline_top(flextbl, part="header", border=fp_border(color="black", width = 2))
+  flextbl <- align(flextbl, align = "center", part = "all")
+  flextbl <- align(flextbl, j = c(1, 2), align = "left", part="all")
+  flextbl <- autofit(flextbl, part = "all")
+  flextbl <- set_table_properties(flextbl, width = 1)
+  
+  flextbl
 }
 
 
@@ -78,26 +151,52 @@ growth_tbl <- function(exposure, outcome, results, results_adj){
 
 exposure <- c("t2_f2_8ip", "t2_f2_23d", "t2_f2_VI", "t2_f2_12i")
 outcome <- c("laz_t2", "laz_t3", "len_velocity_t2_t3", "delta_laz_t2_t3")
-tbl2 <- growth_tbl(exposure, outcome, H1, H1adj)
+expo_var <- c("IPF(2a)-III", "2,3-dinor-iPF(2a)-III", "iPF(2a)-VI", "8,12-iso-iPF(2a)-VI")
+out_var <- c("LAZ Year 1", "LAZ Year 2", "Length velocity Year 1 and Year 2", "Change in LAZ Year 1 to Year 2")
 
-tbl2[, 1] <- c(" ", "Urinary oxidative stress biomarker", "IPF(2a)-III", "", "", "", 
-               "2,3-dinor-iPF(2a)-III", "", "", "",
-               "iPF(2a)-VI", "", "", "", 
-               "8,12-iso-iPF(2a)-VI", "", "", "")
-
-tbl2[, 2] <- c("", "Outcome", "LAZ, Year 1", "LAZ, Year 2", "Length velocity Year 1 to Year 2", "Change in LAZ Year 1 to Year 2",
-               "LAZ, Year 1", "LAZ, Year 2", "Length velocity Year 1 to Year 2", "Change in LAZ Year 1 to Year 2",
-               "LAZ, Year 1", "LAZ, Year 2", "Length velocity Year 1 to Year 2", "Change in LAZ Year 1 to Year 2",
-               "LAZ, Year 1", "LAZ, Year 2", "Length velocity Year 1 to Year 2", "Change in LAZ Year 1 to Year 2")
-
-write.csv(tbl2, here('tables/main/stress-growth-table2.csv'))
+tbl2 <- growth_tbl("Urinary oxidative stress biomarker", expo_var, out_var, exposure, outcome, H1, H1adj)
+tbl2flex <- growth_tbl_flex("Urinary oxidative stress biomarker", expo_var, out_var, exposure, outcome, H1, H1adj)
 
 #### Table 3 ####
 
+exposure <- c("t3_cort_slope", "t3_residual_cort", "t3_saa_slope", "t3_residual_saa")
+outcome <- c("laz_t3")
+expo_var <- c("Pre to post-stress change in cortisol", "Cortisol residualized gain score", "Pre to post-stress change in sAA", "sAA residualized gain score")
+out_var <- c("LAZ Year 2")
 
+tbl3 <- growth_tbl("Salivary stress biomarker", expo_var, out_var, exposure, outcome, H2, H2adj)
+tbl3flex <- growth_tbl_flex("Salivary stress biomarker", expo_var, out_var, exposure, outcome, H2, H2adj)
 
 #### Table 4 ####
 
+exposure <- c("t3_map", "t3_hr_mean")
+outcome <- c("laz_t3")
+expo_var <- c("Mean arterial pressure", "Mean resting heart rate")
+out_var <- c("LAZ Year 2")
+
+tbl4 <- growth_tbl("Resting SAM biomarker", expo_var, out_var, exposure, outcome, H3, H3adj)
+tbl4flex <- growth_tbl_flex("Resting SAM biomarker", expo_var, out_var, exposure, outcome, H3, H3adj)
 
 
 #### Table 5 ####
+
+exposure <- c("t3_gcr_mean", "t3_gcr_cpg12")
+outcome <- c("laz_t3")
+expo_var <- c("Entire promoter region (39 assayed CpG sites)", "NGFI-A transcription factor binding site (CpG site #12)")
+out_var <- c("LAZ Year 2")
+
+tbl5 <- growth_tbl("Methylation site", expo_var, out_var, exposure, outcome, H4, H4adj)
+tbl5flex <- growth_tbl_flex("Methylation site", expo_var, out_var, exposure, outcome, H4, H4adj)
+
+
+
+#### SAVE TABLES ####
+
+write.csv(tbl2, here('tables/main/stress-growth-table2.csv'))
+write.csv(tbl3, here('tables/main/stress-growth-table3.csv'))
+write.csv(tbl4, here('tables/main/stress-growth-table4.csv'))
+write.csv(tbl5, here('tables/main/stress-growth-table5.csv'))
+
+save_as_docx(tbl2flex, values = NULL, path=here('tables/stress-growth main.docx'))
+body_add_flextable(read_docx(path=here('tables/stress-growth main.docx')),
+                   tbl3flex, align = "center", pos = "on", split = FALSE)
