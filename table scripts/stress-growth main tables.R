@@ -197,6 +197,5 @@ write.csv(tbl3, here('tables/main/stress-growth-table3.csv'))
 write.csv(tbl4, here('tables/main/stress-growth-table4.csv'))
 write.csv(tbl5, here('tables/main/stress-growth-table5.csv'))
 
-save_as_docx(tbl2flex, values = NULL, path=here('tables/stress-growth main.docx'))
-body_add_flextable(read_docx(path=here('tables/stress-growth main.docx')),
-                   tbl3flex, align = "center", pos = "on", split = FALSE)
+save_as_docx("Table 2" = tbl2flex, "Table 3" = tbl3flex, "Table 4" = tbl4flex, "Table 5" = tbl5flex, path=here('tables/stress-growth main.docx'))
+
