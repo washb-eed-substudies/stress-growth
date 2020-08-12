@@ -190,7 +190,6 @@ predict_gam_diff <- function(fit, d, quantile_diff=c(0.25,0.75), Xvar, Yvar){
 
   # take difference from the 25th percentile of X
   diff <- t(apply(Xp,1,function(x) x - Xp[q1_pos,]))
-  #diff <- t(apply(Xp,1,function(x) x - Xp[1,]))
 
   # calculate the predicted differences
   point.diff <- diff %*% coef(fit)

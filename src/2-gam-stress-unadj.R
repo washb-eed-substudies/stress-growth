@@ -19,8 +19,8 @@ preds_unadj$res
 
 #Plot the difference from the 25th percentile for the full range of the exposure:
 #NOTE: not making these plots anymore, just using for diagnostics
-# p <- plot_gam_diff(preds_unadj$plotdf)
-# print(p)        
+p <- plot_gam_diff(preds_unadj$plotdf)
+print(p)
 
 #Fit spline with simultaneous confidence intervals
 simul_plot <- gam_simul_CI(res_unadj$fit, res_unadj$dat, xlab="delta_TS", ylab="laz_t3", title="example title")
