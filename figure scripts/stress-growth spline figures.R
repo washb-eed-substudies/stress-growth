@@ -91,14 +91,13 @@ spline_plot_functions <- function(d){
   
   p1 <- d[d$y==levels(d$y)[1],] %>% {ggplot(.,aes(x = X)) +
       geom_smooth(aes(y = fit, color=y), se = F) +
-      geom_rug(aes(x=Q1), sides="b", length = unit(0.15, "npc"), size=1, color="grey30") +
-      geom_rug(aes(x=Q2), sides="b", length = unit(0.15, "npc"), size=1, color="grey30") +
-      geom_rug(aes(x=Q3), sides="b", length = unit(0.15, "npc"), size=1, color="grey30") +
+      geom_rug(aes(x=q1), sides="b", length = unit(0.15, "npc"), size=1, color="grey30") +
+      geom_rug(aes(x=q3), sides="b", length = unit(0.15, "npc"), size=1, color="grey30") +
       # geom_vline(aes(xintercept = Q1), linetype=1, color="grey20") +
       # geom_vline(aes(xintercept = Q2), linetype=1, color="grey20") +
       # geom_vline(aes(xintercept = Q3), linetype=1, color="grey20") +
       geom_ribbon(aes(ymin=lwrS, ymax=uprS, fill=y, color=y), alpha=0.5) +
-      geom_point(aes(y=Y), alpha=0.5) +
+      geom_point(aes(y=Yvar), alpha=0.5) +
       coord_cartesian(xlim = c(.$x.lb, .$x.ub), ylim = c(.$y.lb, .$y.ub)) +
       scale_colour_manual(values=tableau10[c(1:4,1:4,1:4,5:7)], drop=TRUE, limits=color_levels) + 
       scale_fill_manual(values=tableau10[c(1:4,1:4,1:4,5:7)], drop=TRUE, limits=color_levels) + 
