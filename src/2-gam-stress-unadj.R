@@ -3,7 +3,7 @@ rm(list=ls())
 source(here::here("0-config.R"))
 source(here::here("src/0-gam-functions.R"))
 
-d<-read.csv(paste0(dropboxDir, "Data/Cleaned/Audrie/bangladesh-dm-ee-stress-growth-covariates-stresslab-anthro.csv"))
+d<-readRDS(paste0(dropboxDir, "Data/Cleaned/Andrew/stress_growth_data.RDS"))
 
 #Example:
 
@@ -64,7 +64,7 @@ simul_plot$p
 #Secondary Outcome: Change in child WAZ and head circumference-for-age Z score from Year 1 to Year 2
 #Tertiary Outcomes: Change in child WLZ from Year 1 to Year 2
 
-Xvars <- c("t2_f2_8ip", "t2_f2_23d", "t2_f2_VI", "t2_f2_12i")            
+Xvars <- c("t2_f2_8ip", "t2_f2_23d", "t2_f2_VI", "t2_f2_12i", "iso.pca")            
 Yvars <- c("laz_t2", "waz_t2", "whz_t2" ,"hcz_t2", 
            "len_velocity_t2_t3", "wei_velocity_t2_t3", "hc_velocity_t2_t3",
            "laz_t3", "waz_t3", "whz_t3", "hcz_t3",
@@ -108,7 +108,7 @@ saveRDS(H1_res, here("results/unadjusted/H1_res.RDS"))
 
 
 #Save plots
-saveRDS(H1_plot_list, here("figure-objects/H1_unadj_splines.RDS"))
+#saveRDS(H1_plot_list, here("figure-objects/H1_unadj_splines.RDS"))
 
 #Save plot data
 saveRDS(H1_plot_data, here("figure-data/H1_unadj_spline_data.RDS"))
@@ -192,7 +192,7 @@ saveRDS(H2_res, here("results/unadjusted/H2_res.RDS"))
 
 
 #Save plots
-saveRDS(H2_plot_list, here("figure-objects/H2_unadj_splines.RDS"))
+#saveRDS(H2_plot_list, here("figure-objects/H2_unadj_splines.RDS"))
 
 #Save plot data
 saveRDS(H2_plot_data, here("figure-data/H2_unadj_spline_data.RDS"))
@@ -258,7 +258,7 @@ saveRDS(H3_res, here("results/unadjusted/H3_res.RDS"))
 
 
 #Save plots
-saveRDS(H3_plot_list, here("figure-objects/H3_unadj_splines.RDS"))
+#saveRDS(H3_plot_list, here("figure-objects/H3_unadj_splines.RDS"))
 
 #Save plot data
 saveRDS(H3_plot_data, here("figure-data/H3_unadj_spline_data.RDS"))
@@ -323,7 +323,7 @@ saveRDS(H4_res, here("results/unadjusted/H4_res.RDS"))
 
 
 #Save plots
-saveRDS(H4_plot_list, here("figure-objects/H4_unadj_splines.RDS"))
+#saveRDS(H4_plot_list, here("figure-objects/H4_unadj_splines.RDS"))
 
 #Save plot data
 saveRDS(H4_plot_data, here("figure-data/H4_unadj_spline_data.RDS"))

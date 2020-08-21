@@ -117,8 +117,6 @@ for(i in 1:nrow(H1_models)){
 #Explore GAM function
 
 
-function(d, Y, X, W=NULL, V=NULL, id="clusterid", family = "gaussian", pval = 0.2, print=TRUE){
-  
 
 res_adj$fit
   res_adj$dat

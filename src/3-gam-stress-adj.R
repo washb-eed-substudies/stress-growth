@@ -4,7 +4,7 @@ rm(list=ls())
 source(here::here("0-config.R"))
 source(here::here("src/0-gam-functions.R"))
 
-d <- read.csv(paste0(dropboxDir,"/Data/Cleaned/Audrie/bangladesh-dm-ee-stress-growth-covariates-stresslab-anthro.csv"))
+d<-readRDS(paste0(dropboxDir, "Data/Cleaned/Andrew/stress_growth_data.RDS"))
 
 #Set list of adjustment variables
 #Make vectors of adjustment variable names
@@ -97,7 +97,7 @@ W3_oragene.W3_anthro <- c(Wvars, Wvars3_oragene) %>% unique(.)
 #Secondary Outcome: Change in child WAZ and head circumference-for-age Z score from Year 1 to Year 2
 #Tertiary Outcomes: Change in child WLZ from Year 1 to Year 2
 
-Xvars <- c("t2_f2_8ip", "t2_f2_23d", "t2_f2_VI", "t2_f2_12i")            
+Xvars <- c("t2_f2_8ip", "t2_f2_23d", "t2_f2_VI", "t2_f2_12i", "iso.pca")            
 Yvars <- c("laz_t2", "waz_t2", "whz_t2" ,"hcz_t2", 
            "len_velocity_t2_t3", "wei_velocity_t2_t3", "hc_velocity_t2_t3",
            "laz_t3", "waz_t3", "whz_t3", "hcz_t3",
@@ -139,7 +139,7 @@ for(i in 1:nrow(H1_adj_models)){
   res <- data.frame(X=H1_adj_models$X[i], Y=H1_adj_models$Y[i])
   simul_plot <- gam_simul_CI(H1_adj_models$fit[i][[1]], H1_adj_models$dat[i][[1]], xlab=res$X, ylab=res$Y, title="")
   H1_adj_plot_list[[i]] <-  simul_plot$p
-  H1_adj_plot_data <-  rbind(H1_adj_plot_data, data.frame(Xvar=res$X, Yvar=res$Y, adj=0, simul_plot$pred %>% subset(., select = c(fit,se.fit,uprP, lwrP,uprS,lwrS))))
+  H1_adj_plot_data <-  rbind(H1_adj_plot_data, data.frame(Xvar=res$X, Yvar=res$Y, adj=0, simul_plot$pred %>% subset(., select = c(Y,X,id,fit,se.fit,uprP, lwrP,uprS,lwrS))))
 }
 
 
@@ -222,7 +222,7 @@ for(i in 1:nrow(H2_adj_models)){
   res <- data.frame(X=H2_adj_models$X[i], Y=H2_adj_models$Y[i])
   simul_plot <- gam_simul_CI(H2_adj_models$fit[i][[1]], H2_adj_models$dat[i][[1]], xlab=res$X, ylab=res$Y, title="")
   H2_adj_plot_list[[i]] <-  simul_plot$p
-  H2_adj_plot_data <-  rbind(H2_adj_plot_data, data.frame(Xvar=res$X, Yvar=res$Y, adj=0, simul_plot$pred %>% subset(., select = c(fit,se.fit,uprP, lwrP,uprS,lwrS))))
+  H2_adj_plot_data <-  rbind(H2_adj_plot_data, data.frame(Xvar=res$X, Yvar=res$Y, adj=0, simul_plot$pred %>% subset(., select = c(Y,X,id,fit,se.fit,uprP, lwrP,uprS,lwrS))))
 }
 
 
@@ -287,7 +287,7 @@ for(i in 1:nrow(H3_adj_models)){
   res <- data.frame(X=H3_adj_models$X[i], Y=H3_adj_models$Y[i])
   simul_plot <- gam_simul_CI(H3_adj_models$fit[i][[1]], H3_adj_models$dat[i][[1]], xlab=res$X, ylab=res$Y, title="")
   H3_adj_plot_list[[i]] <-  simul_plot$p
-  H3_adj_plot_data <-  rbind(H3_adj_plot_data, data.frame(Xvar=res$X, Yvar=res$Y, adj=0, simul_plot$pred %>% subset(., select = c(fit,se.fit,uprP, lwrP,uprS,lwrS))))
+  H3_adj_plot_data <-  rbind(H3_adj_plot_data, data.frame(Xvar=res$X, Yvar=res$Y, adj=0, simul_plot$pred %>% subset(., select = c(Y,X,id,fit,se.fit,uprP, lwrP,uprS,lwrS))))
 }
 
 
@@ -352,7 +352,7 @@ for(i in 1:nrow(H4_adj_models)){
   res <- data.frame(X=H4_adj_models$X[i], Y=H4_adj_models$Y[i])
   simul_plot <- gam_simul_CI(H4_adj_models$fit[i][[1]], H4_adj_models$dat[i][[1]], xlab=res$X, ylab=res$Y, title="")
   H4_adj_plot_list[[i]] <-  simul_plot$p
-  H4_adj_plot_data <-  rbind(H4_adj_plot_data, data.frame(Xvar=res$X, Yvar=res$Y, adj=0, simul_plot$pred %>% subset(., select = c(fit,se.fit,uprP, lwrP,uprS,lwrS))))
+  H4_adj_plot_data <-  rbind(H4_adj_plot_data, data.frame(Xvar=res$X, Yvar=res$Y, adj=0, simul_plot$pred %>% subset(., select = c(Y,X,id,fit,se.fit,uprP, lwrP,uprS,lwrS))))
 }
 
 
