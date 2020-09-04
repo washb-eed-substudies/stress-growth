@@ -93,13 +93,16 @@ growth_tbl_flex <- function(name, expo_var, out_var, exposure, outcome, results,
                                              "V5" = "Coefficient (95% CI)", "V6" = "P-value",
                                              "V7" = "Coefficient (95% CI)", "V8" = "P-value"))
   flextbl <- add_header_row(flextbl, values = c("","","","", "Unadjusted", "Fully adjusted"), colwidths=c(1,1,1,1,2,2))
-  flextbl <- hline_top(flextbl, part="header", border=fp_border(color="black", width = 2))
+  # flextbl <- hline_top(flextbl, part="header", border=fp_border(color="black"))
   flextbl <- add_header_row(flextbl, values = c("","","","", "Outcome, Q3 v. Q1"), colwidths=c(1,1,1,1,4))
-  flextbl <- hline_top(flextbl, part="header", border=fp_border(color="black", width = 2))
+  # flextbl <- hline_top(flextbl, part="header", border=fp_border(color="black"))
+  flextbl <- hline(flextbl, part="header", border=fp_border(color="black"))
+  flextbl <- hline_bottom(flextbl, part="body", border=fp_border(color="black"))
+  flextbl <- hline_top(flextbl, part="header", border=fp_border(color="black"))
   flextbl <- align(flextbl, align = "center", part = "all")
   flextbl <- align(flextbl, j = c(1, 2), align = "left", part="all")
   flextbl <- autofit(flextbl, part = "all")
-  flextbl <- set_table_properties(flextbl, width = 1)
+  flextbl <- fit_to_width(flextbl, max_width=8)
   
   flextbl
 }
@@ -129,13 +132,13 @@ n_med_col <- c(nperc(d$sex), mediqr(d$t2_f2_8ip), mediqr(d$t2_f2_23d), mediqr(d$
                mediqr(d$momeduy), mediqr(d$cesd_sum_t2), mediqr(d$cesd_sum_ee_t3), mediqr(d$pss_sum_mom_t3), 
                nperc(d$life_viol_any_t3))
 
-tbl1 <- data.table(" " = c("Child","","","","","","","","","","","","","","","","","","","","","","","Mother","","","","","",""),
-                   " " = c("", "Urinary F2-isoprostanes (Year 1)","","","", "Salivary cortisol reactivity (Year 2)","", "sAA reactivity (Year 2)","",
+tbl1 <- data.table("C1" = c("Child","","","","","","","","","","","","","","","","","","","","","","","Mother","","","","","",""),
+                   "C2" = c("", "Urinary F2-isoprostanes (Year 1)","","","", "Salivary cortisol reactivity (Year 2)","", "sAA reactivity (Year 2)","",
                            "SAM biomarkers (Year 2)","", "Glucocorticoid receptor","", "Anthropometry (14 months, Year 1)","","","",
                            "Anthropometry (28 months, Year 2)","","","", "Diarrhea (14 months, Year 1)", "Diarrhea (28 months, Year 2)","",
                            "Anthropometry at enrollment", "Education", "Depression at Year 1", "Depression at Year 2", "Perceived stress at Year 2", 
                            "Intimate partner violence"),
-                   " " = c("Female", "iPF(2a)-III", "2,3-dinor-iPF(2a)-III", "iPF(2a-VI", "8,12-iso-iPF(2a)-VI", 
+                   "C3" = c("Female", "iPF(2a)-III", "2,3-dinor-iPF(2a)-III", "iPF(2a-VI", "8,12-iso-iPF(2a)-VI", 
                            "Change in slope between pre- and post-stressor cortisol", "Cortisol residualized gain score", 
                            "Change in slope between pre- and post-stressor sAA change", "sAA residualized gain score",
                            "Mean arterial pressure", "Resting heart rate", "NR3C1 exon 1F promoter methylation", "NGFI-A transcription factor binding site methylation",
@@ -143,14 +146,25 @@ tbl1 <- data.table(" " = c("Child","","","","","","","","","","","","","","","",
                            "Length-for-age Z score", "Weight-for-age Z score", "Weight-for-length Z score", "Head circumference-for-age Z score",
                            "Caregiver-reported 7-day recall", "Caregiver-reported 7-day recall", "Age (years)", "Height (cm)", "Schooling completed (years)",
                            "CES-D score", "CES-D score", "Perceived Stress Scale score", "Any lifetime exposure"),
-                   "n (%) or median (IQR)" = n_med_col)
+                   "C4" = n_med_col)
+
+tbl1flex <- flextable(tbl1, col_keys=names(tbl1))
+tbl1flex <- set_header_labels(tbl1flex,
+                        values = list("C1" = "", "C2" = "", "C3" = "", "C4" = "n (%) or median (IQR)"))
+tbl1flex <- hline_top(tbl1flex, part="header", border=fp_border(color="black", width = 1))
+tbl1flex <- hline_bottom(tbl1flex, part="all", border=fp_border(color="black", width = 1))
+tbl1flex <- autofit(tbl1flex, part = "all")
+tbl1flex <- align(tbl1flex, j = c(1, 2, 3), align = "left", part="all")
+tbl1flex <- align(tbl1flex, j = 4, align = "center", part="all")
+tbl1flex <- fit_to_width(tbl1flex, max_width=8)
+names(tbl1)<- c("","","","n (%) or median (IQR)")
 
 
 #### Table 2 ####
 
-exposure <- c("t2_f2_8ip", "t2_f2_23d", "t2_f2_VI", "t2_f2_12i")
+exposure <- c("t2_f2_8ip", "t2_f2_23d", "t2_f2_VI", "t2_f2_12i", "iso.pca")
 outcome <- c("laz_t2", "laz_t3", "len_velocity_t2_t3", "delta_laz_t2_t3")
-expo_var <- c("IPF(2a)-III", "2,3-dinor-iPF(2a)-III", "iPF(2a)-VI", "8,12-iso-iPF(2a)-VI")
+expo_var <- c("IPF(2a)-III", "2,3-dinor-iPF(2a)-III", "iPF(2a)-VI", "8,12-iso-iPF(2a)-VI", "Combined urinary oxidative stress biommarkers")
 out_var <- c("LAZ Year 1", "LAZ Year 2", "Length velocity Year 1 and Year 2", "Change in LAZ Year 1 to Year 2")
 
 tbl2 <- growth_tbl("Urinary oxidative stress biomarker", expo_var, out_var, exposure, outcome, H1, H1adj)
@@ -191,11 +205,11 @@ tbl5flex <- growth_tbl_flex("Methylation site", expo_var, out_var, exposure, out
 #### Supplementary Tables ####
 #### Table S1 ####
 
-exposure <- c("t2_f2_8ip", "t2_f2_23d", "t2_f2_VI", "t2_f2_12i")
+exposure <- c("t2_f2_8ip", "t2_f2_23d", "t2_f2_VI", "t2_f2_12i", "iso.pca")
 outcome <- c("waz_t2", "whz_t2", "hcz_t2", "waz_t3", "whz_t3", "hcz_t3",
              "wei_velocity_t2_t3", "hc_velocity_t2_t3",
              "delta_waz_t2_t3", "delta_whz_t2_t3", "delta_hcz_t2_t3")
-expo_var <- c("IPF(2a)-III", "2,3-dinor-iPF(2a)-III", "iPF(2a)-VI", "8,12-iso-iPF(2a)-VI")
+expo_var <- c("IPF(2a)-III", "2,3-dinor-iPF(2a)-III", "iPF(2a)-VI", "8,12-iso-iPF(2a)-VI", "Combined urinary oxidative stress biommarkers")
 out_var <- c("WAZ Year 1", "WLZ Year 1", "HCZ Year 1",
              "WAZ Year 2", "WLZ Year 2", "HCZ Year 2",
              "Weight velocity (kg/month) Year 1 to Year 2",
@@ -250,7 +264,7 @@ write.csv(tbl3, here('tables/main/stress-growth-table3.csv'))
 write.csv(tbl4, here('tables/main/stress-growth-table4.csv'))
 write.csv(tbl5, here('tables/main/stress-growth-table5.csv'))
 
-save_as_docx("Table 2" = tbl2flex, "Table 3" = tbl3flex, "Table 4" = tbl4flex, "Table 5" = tbl5flex, path=here('tables/stress-growth main.docx'))
+save_as_docx("Table 1" = tbl1flex, "Table 2" = tbl2flex, "Table 3" = tbl3flex, "Table 4" = tbl4flex, "Table 5" = tbl5flex, path=here('tables/stress-growth main.docx'))
 
 write.csv(tbls1, here('tables/supplementary/stress-growth-tables1.csv'))
 write.csv(tbls2, here('tables/supplementary/stress-growth-tables2.csv'))
