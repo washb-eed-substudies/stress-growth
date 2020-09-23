@@ -19,7 +19,7 @@ library(kableExtra)
 library(here)
 library(cowplot)
 library(mgcv)
-library(psych)
+#library(psych)
 
 
 source(here("src/0-gam-functions.R"))
