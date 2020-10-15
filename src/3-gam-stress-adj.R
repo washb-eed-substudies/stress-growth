@@ -147,7 +147,7 @@ for(i in 1:nrow(H1_adj_models)){
 
 
 #Save models
-saveRDS(H1_adj_models, paste0(dropboxDir,"results/stress-growth-models/models/H1_adj_models.RDS"))
+#saveRDS(H1_adj_models, paste0(dropboxDir,"results/stress-growth-models/models/H1_adj_models.RDS"))
 
 #Save results
 saveRDS(H1_adj_res, here("results/adjusted/H1_adj_res.RDS"))
@@ -203,50 +203,50 @@ Yvars <- c("laz_t3", "waz_t3", "whz_t3", "hcz_t3")
 W3_salimetrics.W3_anthro
 
 #Fit models
-H2_models <- NULL
+H2_adj_models <- NULL
 for(i in Xvars){
   for(j in Yvars){
     print(i)
     print(j)
     res_adj <- fit_RE_gam(d=d, X=i, Y=j,  W=W3_salimetrics.W3_anthro)
     res <- data.frame(X=i, Y=j, fit=I(list(res_adj$fit)), dat=I(list(res_adj$dat)))
-    H2_models <- bind_rows(H2_models, res)
+    H2_adj_models <- bind_rows(H2_adj_models, res)
   }
 }
 
 #Get primary contrasts
-H2_res <- NULL
-for(i in 1:nrow(H2_models)){
-  res <- data.frame(X=H2_models$X[i], Y=H2_models$Y[i])
-  preds <- predict_gam_diff(fit=H2_models$fit[i][[1]], d=H2_models$dat[i][[1]], quantile_diff=c(0.25,0.75), Xvar=res$X, Yvar=res$Y)
-  H2_res <-  bind_rows(H2_res , preds$res)
+H2_adj_res <- NULL
+for(i in 1:nrow(H2_adj_models)){
+  res <- data.frame(X=H2_adj_models$X[i], Y=H2_adj_models$Y[i])
+  preds <- predict_gam_diff(fit=H2_adj_models$fit[i][[1]], d=H2_adj_models$dat[i][[1]], quantile_diff=c(0.25,0.75), Xvar=res$X, Yvar=res$Y)
+  H2_adj_res <-  bind_rows(H2_adj_res , preds$res)
 }
-H2_res$adjusted <- 0
+H2_adj_res$adjusted <- 0
 
 #Make list of plots
-H2_plot_list <- NULL
-H2_plot_data <- NULL
-for(i in 1:nrow(H2_models)){
+H2_adj_plot_list <- NULL
+H2_adj_plot_data <- NULL
+for(i in 1:nrow(H2_adj_models)){
   print(i)
-  res <- data.frame(X=H2_models$X[i], Y=H2_models$Y[i])
-  simul_plot <- gam_simul_CI(H2_models$fit[i][[1]], H2_models$dat[i][[1]], xlab=res$X, ylab=res$Y, title="")
-  H2_plot_list[[i]] <-  simul_plot$p
-  H2_plot_data <-  rbind(H2_plot_data, data.frame(Xvar=res$X, Yvar=res$Y, adj=0, simul_plot$pred%>% subset(., select = c(Y,X,id,fit,se.fit,uprP, lwrP,uprS,lwrS))))
+  res <- data.frame(X=H2_adj_models$X[i], Y=H2_adj_models$Y[i])
+  simul_plot <- gam_simul_CI(H2_adj_models$fit[i][[1]], H2_adj_models$dat[i][[1]], xlab=res$X, ylab=res$Y, title="")
+  H2_adj_plot_list[[i]] <-  simul_plot$p
+  H2_adj_plot_data <-  rbind(H2_adj_plot_data, data.frame(Xvar=res$X, Yvar=res$Y, adj=0, simul_plot$pred%>% subset(., select = c(Y,X,id,fit,se.fit,uprP, lwrP,uprS,lwrS))))
 }
 
 
 #Save models
-saveRDS(H2_models, paste0(dropboxDir,"results/stress-growth-models/models/adj_H2_models.RDS"))
+#saveRDS(H2_adj_models, paste0(dropboxDir,"results/stress-growth-models/models/adj_H2_adj_models.RDS"))
 
 #Save results
-saveRDS(H2_res, here("results/adjusted/H2_res.RDS"))
+saveRDS(H2_adj_res, here("results/adjusted/H2_adj_res.RDS"))
 
 
 #Save plots
-#saveRDS(H2_plot_list, paste0(dropboxDir,"results/stress-growth-models/figure-objects/H2_adj_splines.RDS"))
+#saveRDS(H2_adj_plot_list, paste0(dropboxDir,"results/stress-growth-models/figure-objects/H2_adj_adj_splines.RDS"))
 
 #Save plot data
-saveRDS(H2_plot_data, paste0(dropboxDir,"results/stress-growth-models/figure-data/H2_adj_spline_data.RDS"))
+saveRDS(H2_adj_plot_data, paste0(dropboxDir,"results/stress-growth-models/figure-data/H2_adj_adj_spline_data.RDS"))
 
 
 
@@ -303,7 +303,7 @@ for(i in 1:nrow(H3_models)){
 
 
 #Save models
-saveRDS(H3_models, paste0(dropboxDir,"results/stress-growth-models/models/adj_H3_models.RDS"))
+#saveRDS(H3_models, paste0(dropboxDir,"results/stress-growth-models/models/adj_H3_models.RDS"))
 
 #Save results
 saveRDS(H3_res, here("results/adjusted/H3_adj_res.RDS"))
@@ -372,7 +372,7 @@ for(i in 1:nrow(H4_models)){
 
 
 #Save models
-saveRDS(H4_models, paste0(dropboxDir,"results/stress-growth-models/models/adj_H4_models.RDS"))
+#saveRDS(H4_models, paste0(dropboxDir,"results/stress-growth-models/models/adj_H4_models.RDS"))
 
 #Save results
 saveRDS(H4_res, here("results/adjusted/H4_adj_res.RDS"))

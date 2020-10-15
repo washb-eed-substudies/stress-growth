@@ -36,27 +36,27 @@ fit_RE_gam <- function(d, Y, X, W=NULL, V=NULL, id="clusterid", family = "gaussi
   if(!is.null(W)){
     W <- subset(d, select = W)
   }
-   Y <- subset(d, select = Y)
-   colnames(Y) <- "Y"
-   X <- subset(d, select = X)
-   colnames(X) <- "X"
-   id <- subset(d, select = id)
-   colnames(id) <- "id"
-   
-   if(!is.null(V)){
-     Vvar <- subset(d, select = V)
-     colnames(Vvar) <- "V"
-   }else{
-     Vvar <-data.frame(V=rep(1, nrow(d)))
-   }
-
-    if(!is.null(W)){
-      gamdat <- data.frame(Y, X, id, Vvar, W)
-    }else{
-      gamdat <- data.frame(Y, X, id, Vvar)
-    }
-
-   
+  Y <- subset(d, select = Y)
+  colnames(Y) <- "Y"
+  X <- subset(d, select = X)
+  colnames(X) <- "X"
+  id <- subset(d, select = id)
+  colnames(id) <- "id"
+  
+  if(!is.null(V)){
+    Vvar <- subset(d, select = V)
+    colnames(Vvar) <- "V"
+  }else{
+    Vvar <-data.frame(V=rep(1, nrow(d)))
+  }
+  
+  if(!is.null(W)){
+    gamdat <- data.frame(Y, X, id, Vvar, W)
+  }else{
+    gamdat <- data.frame(Y, X, id, Vvar)
+  }
+  
+  
   n.orig <- dim(gamdat)[1]
   rowdropped <- rep(1, nrow(gamdat))
   rowdropped[which(complete.cases(gamdat))] <- 0
@@ -72,7 +72,7 @@ fit_RE_gam <- function(d, Y, X, W=NULL, V=NULL, id="clusterid", family = "gaussi
   if(!is.null(W)){
     colnamesW <- names(W)
     screenW <- subset(gamdat, select = colnamesW)
-    }else{
+  }else{
     screenW <- NULL
   }
   if(!is.null(screenW)){
@@ -83,15 +83,15 @@ fit_RE_gam <- function(d, Y, X, W=NULL, V=NULL, id="clusterid", family = "gaussi
   }else{
     Wscreen = NULL
   }
-
-      if(!is.null(Wscreen)){
-        d <- subset(gamdat, select = c("Y","X","id", "V", Wscreen))
-      }else{
-        d <- subset(gamdat, select = c("Y","X","id", "V"))
-      }
+  
+  if(!is.null(Wscreen)){
+    d <- subset(gamdat, select = c("Y","X","id", "V", Wscreen))
+  }else{
+    d <- subset(gamdat, select = c("Y","X","id", "V"))
+  }
   
   d$dummy<-1
-
+  
   if(!is.null(W) & length(Wscreen)>0){
     
     #Make formula for adjusted model
@@ -120,12 +120,12 @@ fit_RE_gam <- function(d, Y, X, W=NULL, V=NULL, id="clusterid", family = "gaussi
       eq_num=NULL
     }
     if(length(W_factors)+length(W_indicator)>0){
-    eq_fact <- paste0(" + ",paste0(c(W_factors,W_indicator), collapse=" + "))
+      eq_fact <- paste0(" + ",paste0(c(W_factors,W_indicator), collapse=" + "))
     }else{
       eq_fact=NULL
     }
     #fit model
-   
+    
     if(!is.null(V)){
       form <- paste0("Y~s(X, bs=\"cr\")+",eq_fact," +",eq_num,"+ s(id,bs=\"re\",by=dummy)")
       form <- gsub("+ +","+",form, fixed=TRUE)
@@ -157,7 +157,7 @@ Mode <- function(x) {
   ux <- unique(x)
   ux[which.max(tabulate(match(x, ux)))]
 }
-  
+
 predict_gam_diff <- function(fit, d, quantile_diff=c(0.25,0.75), Xvar, Yvar){
   
   d$dummy<-0
@@ -165,13 +165,13 @@ predict_gam_diff <- function(fit, d, quantile_diff=c(0.25,0.75), Xvar, Yvar){
   Wvars <- colnames(d)[!(colnames(d) %in% c("Y","X" ,"id" ,"dummy"))]
   #set covariates to the median/mode
   for(i in Wvars){
-   if(class(d[,i])=="character"|class(d[,i])=="factor"){
-     d[,i] <- Mode(d[,i])
-   }else{
-     d[,i] <- median(d[,i])
-   }
+    if(class(d[,i])=="character"|class(d[,i])=="factor"){
+      d[,i] <- Mode(d[,i])
+    }else{
+      d[,i] <- median(d[,i])
+    }
   }
-
+  
   d <- d[order(d$X),]
   
   #Make sure subset has overall quantiles within it
@@ -182,29 +182,35 @@ predict_gam_diff <- function(fit, d, quantile_diff=c(0.25,0.75), Xvar, Yvar){
   d$X[q1_pos] <- q1
   d$X[q3_pos] <- q3
   
+  #get the direct prediction
+  preds <- predict(fit,newdata=d,type="response")
+  
+  #get the prediction matrix
   Xp <- predict(fit,newdata=d,type="lpmatrix")
   # order the prediction matrix in the order of the exposure
   Xp <- Xp[order(d$X),]
   
   
-
+  
   # take difference from the 25th percentile of X
   diff <- t(apply(Xp,1,function(x) x - Xp[q1_pos,]))
-
+  
   # calculate the predicted differences
   point.diff <- diff %*% coef(fit)
-
+  
   # calculate the pointwise SE - naive SE
   se.diff <- sqrt(diag( diff%*%vcov(fit)%*%t(diff) ) )
-
+  
   # calculate upper and lower bounds
   lb.diff <- point.diff - 1.96*se.diff
   ub.diff <- point.diff + 1.96*se.diff
   Zval <-  abs(point.diff/se.diff)
   Pval <- exp(-0.717*Zval - 0.416*Zval^2)
-
-  plotdf<-data.frame(Y=Yvar, X= Xvar, x=d$X, q1=d$X[q1_pos], q3=d$X[q3_pos], point.diff, lb.diff=lb.diff, ub.diff=ub.diff, Pval=Pval)
-
+  
+  plotdf<-data.frame(Y=Yvar, X= Xvar, q1=d$X[q1_pos], q3=d$X[q3_pos], 
+                     pred.q1=preds[q1_pos], pred.q3=preds[q3_pos], 
+                     point.diff, lb.diff=lb.diff, ub.diff=ub.diff, Pval=Pval)
+  
   
   res <- plotdf[round(nrow(d)*quantile_diff[2],0),]
   return(list(res=res, plotdf=plotdf))
@@ -250,7 +256,7 @@ predict_gam_int <- function(fit, d, quantile_diff=c(0.25,0.75), Xvar, Yvar){
     
     # take difference from the 25th percentile of X
     diff <- t(apply(Xp,1,function(x) x - Xp[q1_pos,]))
-
+    
     # calculate the predicted differences
     point.diff <- diff %*% coef(fit)
     
@@ -267,7 +273,7 @@ predict_gam_int <- function(fit, d, quantile_diff=c(0.25,0.75), Xvar, Yvar){
   }
   
   res <- bind_rows(reslist)
-
+  
   return(list(res=res, plotdf=plotdf_list))
 }
 
@@ -326,7 +332,7 @@ gam_simul_CI <- function(m,newdata,nreps=10000, xlab="", ylab="", title="") {
     geom_path(aes(x=X, y=fit ), color="black") +
     xlab(xlab) + ylab(ylab) +
     ggtitle(title)
-
+  
   return(list(p=p, pred=pred))
 }
 

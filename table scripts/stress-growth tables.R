@@ -29,9 +29,12 @@ growth_tbl <- function(name, expo_var, out_var, exposure, outcome, results, resu
   ### this function produces a table that can be saved as a csv
   
   tbl <- data.table(" " = character(), " " = character(), " " = character(), " " = character(),
-                    " Outcome, Q3 v. Q1" = character(), " " = character(), " " = character(), " " = character())
-  tbl <- rbind(tbl, list(" ", " ", " ", " ", "Unadjusted", " ", "Fully adjusted", " "))
-  tbl <- rbind(tbl, list(" ", "Outcome", "Q1 Mean", "Q3 Mean", "Coefficient (95% CI)", "P-value", "Coefficient (95% CI)", "P-value"))
+                    " Outcome, Q3 v. Q1" = character(), " " = character(), " " = character(), " " = character(), 
+                    " " = character(), " " = character(), " " = character(), " " = character())
+  tbl <- rbind(tbl, list(" ", " ", " ", " ", "Unadjusted", " ", " ", " ", "Fully adjusted", " ", " ", " "))
+  tbl <- rbind(tbl, list(" ", "Outcome", "Q1 Mean", "Q3 Mean", 
+                         "Predicted Outcome at Q1", "Predicted Outcome at Q3", "Coefficient (95% CI)", "P-value", 
+                         "Predicted Outcome at Q1", "Predicted Outcome at Q3", "Coefficient (95% CI)", "P-value"))
   for (i in 1:length(exposure)) {
     for (j in 1:length(outcome)) {
       exp <- exposure[i]
@@ -41,13 +44,17 @@ growth_tbl <- function(name, expo_var, out_var, exposure, outcome, results, resu
       unadj <- paste(round(filtered_res$`point.diff`, 2), " (", round(filtered_res$`lb.diff`, 2), ", ", round(filtered_res$`ub.diff`, 2), ")", sep="")
       adj <- paste(round(filtered_adj$`point.diff`, 2), " (", round(filtered_adj$`lb.diff`, 2), ", ", round(filtered_adj$`ub.diff`, 2), ")", sep="")
       if (j==1){
-        tbl <- rbind(tbl, list(expo_var[i], out_var[j], round(filtered_res$q1, 2), round(filtered_res$q3, 2), unadj, round(filtered_res$Pval, 2), adj, round(filtered_adj$Pval, 2)))
+        tbl <- rbind(tbl, list(expo_var[i], out_var[j], round(filtered_res$q1, 2), round(filtered_res$q3, 2), 
+                               round(filtered_res$pred.q1, 2), round(filtered_res$pred.q3, 2), unadj, round(filtered_res$Pval, 2), 
+                               round(filtered_adj$pred.q1, 2), round(filtered_adj$pred.q3, 2), adj, round(filtered_adj$Pval, 2)))
       }else {
-        tbl <- rbind(tbl, list("", out_var[j], round(filtered_res$q1, 2), round(filtered_res$q3, 2), unadj, round(filtered_res$Pval, 2), adj, round(filtered_adj$Pval, 2)))
+        tbl <- rbind(tbl, list("", out_var[j], round(filtered_res$q1, 2), round(filtered_res$q3, 2), 
+                               round(filtered_res$pred.q1, 2), round(filtered_res$pred.q3, 2), unadj, round(filtered_res$Pval, 2), 
+                               round(filtered_adj$pred.q1, 2), round(filtered_adj$pred.q3, 2), adj, round(filtered_adj$Pval, 2)))
       }
     }
     if (i != length(exposure)) {
-      tbl <- rbind(tbl, list("","","","","","","",""))
+      tbl <- rbind(tbl, list("","","","","","","","","","","",""))
     }
   }
   tbl
@@ -66,7 +73,7 @@ growth_tbl_flex <- function(name, expo_var, out_var, exposure, outcome, results,
   ### directly to a word document!
   
   # build table
-  tbl <- data.table(matrix(nrow=0, ncol=8))
+  tbl <- data.table(matrix(nrow=0, ncol=12))
   for (i in 1:length(exposure)) {
     for (j in 1:length(outcome)) {
       exp <- exposure[i]
@@ -76,13 +83,17 @@ growth_tbl_flex <- function(name, expo_var, out_var, exposure, outcome, results,
       unadj <- paste(round(filtered_res$`point.diff`, 2), " (", round(filtered_res$`lb.diff`, 2), ", ", round(filtered_res$`ub.diff`, 2), ")", sep="")
       adj <- paste(round(filtered_adj$`point.diff`, 2), " (", round(filtered_adj$`lb.diff`, 2), ", ", round(filtered_adj$`ub.diff`, 2), ")", sep="")
       if (j==1){
-        tbl <- rbind(tbl, list(expo_var[i], out_var[j], round(filtered_res$q1, 2), round(filtered_res$q3, 2), unadj, round(filtered_res$Pval, 2), adj, round(filtered_adj$Pval, 2)))
+        tbl <- rbind(tbl, list(expo_var[i], out_var[j], round(filtered_res$q1, 2), round(filtered_res$q3, 2), 
+                               round(filtered_res$pred.q1, 2), round(filtered_res$pred.q3, 2), unadj, round(filtered_res$Pval, 2), 
+                               round(filtered_adj$pred.q1, 2), round(filtered_adj$pred.q3, 2), adj, round(filtered_adj$Pval, 2)))
       }else {
-        tbl <- rbind(tbl, list("", out_var[j], round(filtered_res$q1, 2), round(filtered_res$q3, 2), unadj, round(filtered_res$Pval, 2), adj, round(filtered_adj$Pval, 2)))
+        tbl <- rbind(tbl, list(" ", out_var[j], round(filtered_res$q1, 2), round(filtered_res$q3, 2), 
+                               round(filtered_res$pred.q1, 2), round(filtered_res$pred.q3, 2), unadj, round(filtered_res$Pval, 2), 
+                               round(filtered_adj$pred.q1, 2), round(filtered_adj$pred.q3, 2), adj, round(filtered_adj$Pval, 2)))
       }
     }
     if (i != length(exposure)) {
-      tbl <- rbind(tbl, list("","","","","","","",""))
+      tbl <- rbind(tbl, list("","","","","","","","", "","","",""))
     }
   }
   
@@ -90,11 +101,11 @@ growth_tbl_flex <- function(name, expo_var, out_var, exposure, outcome, results,
   flextbl<-flextable(tbl, col_keys=names(tbl))
   flextbl <- set_header_labels(flextbl,
                                values = list("V1" = name, "V2" = "Outcome", "V3" = "Q1 Mean", "V4" = "Q3 Mean",
-                                             "V5" = "Coefficient (95% CI)", "V6" = "P-value",
-                                             "V7" = "Coefficient (95% CI)", "V8" = "P-value"))
-  flextbl <- add_header_row(flextbl, values = c("","","","", "Unadjusted", "Fully adjusted"), colwidths=c(1,1,1,1,2,2))
+                                             "V5" = "Predicted Outcome at Q1", "V6" = "Predicted Outcome at Q3", "V7" = "Coefficient (95% CI)", "V8" = "P-value",
+                                             "V9" = "Predicted Outcome at Q1", "V10" = "Predicted Outcome at Q3", "V11" = "Coefficient (95% CI)", "V12" = "P-value"))
+  flextbl <- add_header_row(flextbl, values = c("","","","", "Unadjusted", "Fully adjusted"), colwidths=c(1,1,1,1,4,4))
   # flextbl <- hline_top(flextbl, part="header", border=fp_border(color="black"))
-  flextbl <- add_header_row(flextbl, values = c("","","","", "Outcome, Q3 v. Q1"), colwidths=c(1,1,1,1,4))
+  flextbl <- add_header_row(flextbl, values = c("","","","", "Outcome, Q3 v. Q1"), colwidths=c(1,1,1,1,8))
   # flextbl <- hline_top(flextbl, part="header", border=fp_border(color="black"))
   flextbl <- hline(flextbl, part="header", border=fp_border(color="black"))
   flextbl <- hline_bottom(flextbl, part="body", border=fp_border(color="black"))
@@ -174,7 +185,7 @@ tbl2flex <- growth_tbl_flex("Urinary oxidative stress biomarker", expo_var, out_
 
 exposure <- c("t3_cort_slope", "t3_residual_cort", "t3_saa_slope", "t3_residual_saa")
 outcome <- c("laz_t3")
-expo_var <- c("Pre to post-stress change in cortisol", "Cortisol residualized gain score", "Pre to post-stress change in sAA", "sAA residualized gain score")
+expo_var <- c("Pre to post-stress change in slope of cortisol", "Cortisol residualized gain score", "Pre to post-stress change in slope of sAA", "sAA residualized gain score")
 out_var <- c("LAZ Year 2")
 
 tbl3 <- growth_tbl("Salivary stress biomarker", expo_var, out_var, exposure, outcome, H2, H2adj)
@@ -226,7 +237,7 @@ tbls1flex <- growth_tbl_flex("Urinary oxidative stress biomarker", expo_var, out
 
 exposure <- c("t3_cort_slope", "t3_residual_cort", "t3_saa_slope", "t3_residual_saa")
 outcome <- c("waz_t3", "whz_t3", "hcz_t3")
-expo_var <- c("Pre to post-stress change in cortisol", "Cortisol residualized gain score", "Pre to post-stress change in sAA", "sAA residualized gain score")
+expo_var <- c("Pre to post-stress change in slope of cortisol", "Cortisol residualized gain score", "Pre to post-stress change in slope of sAA", "sAA residualized gain score")
 out_var <- c("WAZ Year 2", "WLZ Year 2", "HCZ Year 2")
 
 tbls2 <- growth_tbl("Salivary stress biomarker", expo_var, out_var, exposure, outcome, H2, H2adj)
