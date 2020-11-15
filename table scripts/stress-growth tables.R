@@ -275,11 +275,11 @@ write.csv(tbl3, here('tables/main/stress-growth-table3.csv'))
 write.csv(tbl4, here('tables/main/stress-growth-table4.csv'))
 write.csv(tbl5, here('tables/main/stress-growth-table5.csv'))
 
-save_as_docx("Table 1" = tbl1flex, "Table 2" = tbl2flex, "Table 3" = tbl3flex, "Table 4" = tbl4flex, "Table 5" = tbl5flex, path=here('tables/stress-growth main.docx'))
+save_as_docx("Table 1" = tbl1flex, "Table 2" = tbl2flex, "Table 3" = tbl3flex, "Table 4" = tbl4flex, "Table 5" = tbl5flex, path='C:/Users/Sophia/Documents/WASH/WASH Stress and Growth/stress-growth main.docx')
 
 write.csv(tbls1, here('tables/supplementary/stress-growth-tables1.csv'))
 write.csv(tbls2, here('tables/supplementary/stress-growth-tables2.csv'))
 write.csv(tbls3, here('tables/supplementary/stress-growth-tables3.csv'))
 write.csv(tbls4, here('tables/supplementary/stress-growth-tables4.csv'))
 
-save_as_docx("Table S1" = tbls1flex, "Table S2" = tbls2flex, "Table S3" = tbls3flex, "Table S4" = tbls4flex, path=here('tables/stress-growth supplementary.docx'))
+save_as_docx("Table S1" = tbls1flex, "Table S2" = tbls2flex, "Table S3" = tbls3flex, "Table S4" = tbls4flex, path='C:/Users/Sophia/Documents/WASH/WASH Stress and Growth/stress-growth supplementary.docx')
