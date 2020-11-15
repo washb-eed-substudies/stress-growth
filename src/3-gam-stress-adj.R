@@ -15,7 +15,7 @@ Wvars<-c("sex","birthord", "momage","momheight","momedu",
          "hfiacat", "Nlt18","Ncomp", "watmin", "walls", "floor", "elec", "asset_wardrobe",
          "asset_table", "asset_chair", "asset_clock","asset_khat", "asset_chouki", 
          "asset_radio", "asset_tv", "asset_refrig", "asset_bike", "asset_moto", "asset_sewmach", 
-         "asset_mobile", "n_cattle", "n_goat", "n_chicken", "cesd_sum_t2", "diar7d_t2", "lenhei_med_t2", "weight_med_t2")
+         "asset_mobile", "n_cattle", "n_goat", "n_chicken", "cesd_sum_t2", "diar7d_t2", "lenhei_med_t2", "weight_med_t2", "tr")
 
 Wvars[!(Wvars %in% colnames(d))]
 
