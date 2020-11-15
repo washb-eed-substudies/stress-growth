@@ -29,12 +29,12 @@ growth_tbl <- function(name, expo_var, out_var, exposure, outcome, results, resu
   ### this function produces a table that can be saved as a csv
   
   tbl <- data.table(" " = character(), " " = character(), " " = character(), " " = character(),
-                    " Outcome, Q3 v. Q1" = character(), " " = character(), " " = character(), " " = character(), 
+                    " Outcome, 75th Percentile v. 25th Percentile" = character(), " " = character(), " " = character(), " " = character(), 
                     " " = character(), " " = character(), " " = character(), " " = character())
   tbl <- rbind(tbl, list(" ", " ", " ", " ", "Unadjusted", " ", " ", " ", "Fully adjusted", " ", " ", " "))
-  tbl <- rbind(tbl, list(" ", "Outcome", "Q1 Mean", "Q3 Mean", 
-                         "Predicted Outcome at Q1", "Predicted Outcome at Q3", "Coefficient (95% CI)", "P-value", 
-                         "Predicted Outcome at Q1", "Predicted Outcome at Q3", "Coefficient (95% CI)", "P-value"))
+  tbl <- rbind(tbl, list(" ", "Outcome", "25th Percentile", "75th Percentile", 
+                         "Predicted Outcome at 25th Percentile", "Predicted Outcome at 75th Percentile", "Coefficient (95% CI)", "P-value", 
+                         "Predicted Outcome at 25th Percentile", "Predicted Outcome at 75th Percentile", "Coefficient (95% CI)", "P-value"))
   for (i in 1:length(exposure)) {
     for (j in 1:length(outcome)) {
       exp <- exposure[i]
@@ -100,12 +100,12 @@ growth_tbl_flex <- function(name, expo_var, out_var, exposure, outcome, results,
   # format for export
   flextbl<-flextable(tbl, col_keys=names(tbl))
   flextbl <- set_header_labels(flextbl,
-                               values = list("V1" = name, "V2" = "Outcome", "V3" = "Q1 Mean", "V4" = "Q3 Mean",
-                                             "V5" = "Predicted Outcome at Q1", "V6" = "Predicted Outcome at Q3", "V7" = "Coefficient (95% CI)", "V8" = "P-value",
-                                             "V9" = "Predicted Outcome at Q1", "V10" = "Predicted Outcome at Q3", "V11" = "Coefficient (95% CI)", "V12" = "P-value"))
+                               values = list("V1" = name, "V2" = "Outcome", "V3" = "25th Percentile", "V4" = "75th Percentile",
+                                             "V5" = "Predicted Outcome at 25th Percentile", "V6" = "Predicted Outcome at 75th Percentile", "V7" = "Coefficient (95% CI)", "V8" = "P-value",
+                                             "V9" = "Predicted Outcome at 25th Percentile", "V10" = "Predicted Outcome at 75th Percentile", "V11" = "Coefficient (95% CI)", "V12" = "P-value"))
   flextbl <- add_header_row(flextbl, values = c("","","","", "Unadjusted", "Fully adjusted"), colwidths=c(1,1,1,1,4,4))
   # flextbl <- hline_top(flextbl, part="header", border=fp_border(color="black"))
-  flextbl <- add_header_row(flextbl, values = c("","","","", "Outcome, Q3 v. Q1"), colwidths=c(1,1,1,1,8))
+  flextbl <- add_header_row(flextbl, values = c("","","","", "Outcome, 75th Percentile v. 25th Percentile"), colwidths=c(1,1,1,1,8))
   # flextbl <- hline_top(flextbl, part="header", border=fp_border(color="black"))
   flextbl <- hline(flextbl, part="header", border=fp_border(color="black"))
   flextbl <- hline_bottom(flextbl, part="body", border=fp_border(color="black"))

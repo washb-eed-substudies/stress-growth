@@ -1,6 +1,6 @@
-""," "," "," "," "," Outcome, Q3 v. Q1"," "," "," "," "," "," "," "
+""," "," "," "," "," Outcome, 75th Percentile v. 25th Percentile"," "," "," "," "," "," "," "
 "1"," "," "," "," ","Unadjusted"," "," "," ","Fully adjusted"," "," "," "
-"2"," ","Outcome","Q1 Mean","Q3 Mean","Predicted Outcome at Q1","Predicted Outcome at Q3","Coefficient (95% CI)","P-value","Predicted Outcome at Q1","Predicted Outcome at Q3","Coefficient (95% CI)","P-value"
+"2"," ","Outcome","25th Percentile","75th Percentile","Predicted Outcome at 25th Percentile","Predicted Outcome at 75th Percentile","Coefficient (95% CI)","P-value","Predicted Outcome at 25th Percentile","Predicted Outcome at 75th Percentile","Coefficient (95% CI)","P-value"
 "3","Pre to post-stress change in slope of cortisol","LAZ Year 2","-0.01","0","-1.41","-1.4","0.01 (-0.08, 0.09)","0.97","-1.89","-1.94","-0.05 (-0.2, 0.09)","0.95"
 "4","","","","","","","","","","","",""
 "5","Cortisol residualized gain score","LAZ Year 2","-0.21","0.14","-1.41","-1.41","0 (-0.09, 0.08)","0.97","-1.9","-1.85","0.05 (-0.04, 0.14)","0.95"
