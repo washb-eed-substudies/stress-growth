@@ -87,7 +87,6 @@ for(i in 1:nrow(H1_models)){
   preds <- predict_gam_diff(fit=H1_models$fit[i][[1]], d=H1_models$dat[i][[1]], quantile_diff=c(0.25,0.75), Xvar=res$X, Yvar=res$Y)
   H1_res <-  bind_rows(H1_res , preds$res)
 }
-H1_res$adjusted <- 0
 
 #Make list of plots
 H1_plot_list <- NULL
@@ -171,7 +170,6 @@ for(i in 1:nrow(H2_models)){
   preds <- predict_gam_diff(fit=H2_models$fit[i][[1]], d=H2_models$dat[i][[1]], quantile_diff=c(0.25,0.75), Xvar=res$X, Yvar=res$Y)
   H2_res <-  bind_rows(H2_res , preds$res)
 }
-H2_res$adjusted <- 0
 
 #Make list of plots
 H2_plot_list <- NULL
@@ -237,7 +235,6 @@ for(i in 1:nrow(H3_models)){
   preds <- predict_gam_diff(fit=H3_models$fit[i][[1]], d=H3_models$dat[i][[1]], quantile_diff=c(0.25,0.75), Xvar=res$X, Yvar=res$Y)
   H3_res <-  bind_rows(H3_res , preds$res)
 }
-H3_res$adjusted <- 0
 
 #Make list of plots
 H3_plot_list <- NULL
@@ -302,7 +299,6 @@ for(i in 1:nrow(H4_models)){
   preds <- predict_gam_diff(fit=H4_models$fit[i][[1]], d=H4_models$dat[i][[1]], quantile_diff=c(0.25,0.75), Xvar=res$X, Yvar=res$Y)
   H4_res <-  bind_rows(H4_res , preds$res)
 }
-H4_res$adjusted <- 0
 
 #Make list of plots
 H4_plot_list <- NULL

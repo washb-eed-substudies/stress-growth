@@ -110,6 +110,21 @@ df.pca <- data.frame(childid=id, iso.pca=df$iso.pca)
 dfull <- left_join(d, df.pca, by="childid")
 hist(dfull$iso.pca)
 
+## add household wealth
+d_hhwealth <- read.csv("C:/Users/Sophia/Documents/ee-secondary/sophia scripts/hhwealth.csv")
+dfull <- left_join(dfull, d_hhwealth, by="dataid")
+
+# convert time of day of pre-stressor measurement of cortisol and sAA into continuous variable
+time_day <- dfull$t3_col_time_z01
+time_split <- str_split(time_day, ":")
+cont_time <- function(list_hr_min){
+  # takes in list of time
+  # first number is hour of the day
+  # second number in list is minute of the hour
+  num_time <- as.numeric(unlist(list_hr_min))
+  num_time[1]+num_time[2]/60
+}
+dfull$t3_col_time_z01_cont <- sapply(time_split, cont_time)
 
 saveRDS(dfull, paste0(dropboxDir,"Data/Cleaned/Andrew/stress_growth_data.RDS"))
 
