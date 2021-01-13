@@ -21,8 +21,10 @@ library(cowplot)
 library(mgcv)
 library(psych)
 
-
-source(here("src/0-gam-functions.R"))
+if(!require(washbgam)){
+  devtools::install_github("washb-eed-substudies/washbgam")
+  library(washbgam)
+}
 
 dropboxDir <- NULL
 if(dir.exists("C:/Users/andre/Dropbox/WASHB-EE-analysis/WBB-EE-analysis/")){ 
