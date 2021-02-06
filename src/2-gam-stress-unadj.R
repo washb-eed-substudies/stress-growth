@@ -63,7 +63,7 @@ simul_plot$p
 #Secondary Outcome: Change in child WAZ and head circumference-for-age Z score from Year 1 to Year 2
 #Tertiary Outcomes: Change in child WLZ from Year 1 to Year 2
 
-Xvars <- c("t2_f2_8ip", "t2_f2_23d", "t2_f2_VI", "t2_f2_12i", "iso.pca")            
+Xvars <- c("t2_f2_8ip", "t2_f2_23d", "t2_f2_VI", "t2_f2_12i", "t2_iso_pca")            
 Yvars <- c("laz_t2", "waz_t2", "whz_t2" ,"hcz_t2", 
            "len_velocity_t2_t3", "wei_velocity_t2_t3", "hc_velocity_t2_t3",
            "laz_t3", "waz_t3", "whz_t3", "hcz_t3",
@@ -149,7 +149,8 @@ saveRDS(H1_plot_data, here("figure-data/H1_unadj_spline_data.RDS"))
 #Secondary Outcome: Child WAZ and head circumference-for-age Z score at Year 2
 #Tertiary Outcome: Child WLZ at Year 2
 
-Xvars <- c("t3_cort_slope", "t3_residual_cort", "t3_saa_slope", "t3_residual_saa")            
+Xvars <- c("t3_cort_slope", "t3_residual_cort", "t3_cort_z01", "t3_cort_z03",
+           "t3_saa_slope", "t3_residual_saa", "t3_saa_z01", "t3_saa_z02")     
 Yvars <- c("laz_t3", "waz_t3", "whz_t3", "hcz_t3")
 
 #Fit models

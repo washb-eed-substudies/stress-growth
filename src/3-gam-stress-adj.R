@@ -18,8 +18,7 @@ Wvars[!(Wvars %in% colnames(d))]
 
 
 
-#Add in time varying covariates:
-
+# time varying covariates:
 Wvars2_anthro<-c("ageday_at2", "month_at2")
 Wvars3_anthro<-c("ageday_at3", "month_at3", "diar7d_t3", "cesd_sum_ee_t3", "pss_sum_mom_t3", "life_viol_any_t3")  
 
@@ -29,32 +28,12 @@ Wvars3_salimetrics<-c("laz_t2", "waz_t2", "ageday_t3_salimetrics", "month_lt3", 
 Wvars3_oragene<-c("laz_t2", "waz_t2", "ageday_t3_oragene", "month_ot3", "cesd_sum_ee_t3", "pss_sum_mom_t3", "diar7d_t3", "life_viol_any_t3") 
 
 
-#Add in time-varying covariates
-# W<- subset(d, select=Wvars)
-# W2_anthro<- subset(d, select=Wvars2_anthro)
-# W3_anthro<- subset(d, select=Wvars3_anthro)
-# 
-# W2_F2<- subset(d, select=Wvars2_F2)
-# W3_vital<- subset(d, select=Wvars3_vital)
-# W3_salimetrics<- subset(d, select=Wvars3_salimetrics)
-# W3_oragene<- subset(d, select=Wvars3_oragene)
-
-# W2_F2.W2_anthro <- cbind(W2_F2,W2_anthro) %>% subset(., select = which(!duplicated(names(.))))
-# W2_F2.W3_anthro <- cbind(W2_F2,W3_anthro) %>% subset(., select = which(!duplicated(names(.))))
-# W2_F2.W2_anthro.W3_anthro <- cbind(W2_F2,W2_anthro,W3_anthro) %>% subset(., select = which(!duplicated(names(.))))
-# W3_vital.W3_anthro <- cbind(W3_vital,W3_anthro) %>% subset(., select = which(!duplicated(names(.))))
-# W3_salimetrics.W3_anthro <- cbind(W3_salimetrics,W3_anthro) %>% subset(., select = which(!duplicated(names(.))))
-# W3_oragene.W3_anthro <- cbind(W3_oragene,W3_anthro) %>% subset(., select = which(!duplicated(names(.))))
-# 
-
+# add time-varying covariates
 # add hcz and time of day measurement later in pick covariates function 
 W2_F2.W2_anthro <- c(Wvars, Wvars2_F2 ,Wvars2_anthro) %>% unique(.)
 W2_F2.W3_anthro <- c(Wvars, Wvars2_F2 ,Wvars3_anthro, 
                      "laz_t2", "waz_t2") %>% unique(.)
 W2_F2.W23_anthro <- c(Wvars, Wvars2_F2, Wvars2_anthro, Wvars3_anthro)
-# W3_vital.W3_anthro <- c(Wvars, Wvars3_vital,Wvars3_anthro) %>% unique(.)
-# W3_salimetrics.W3_anthro <- c(Wvars, Wvars3_salimetrics,Wvars3_anthro) %>% unique(.)
-# W3_oragene.W3_anthro <- c(Wvars, Wvars3_oragene,Wvars3_anthro) %>% unique(.)
 W3_vital.W3_anthro <- c(Wvars, Wvars3_vital, Wvars3_anthro) %>% unique(.)
 W3_salimetrics.W3_anthro <- c(Wvars, Wvars3_salimetrics, Wvars3_anthro) %>% unique(.)
 W3_oragene.W3_anthro <- c(Wvars, Wvars3_oragene, Wvars3_anthro) %>% unique(.)
@@ -64,12 +43,13 @@ pick_covariates <- function(i, j){
   # i is exposure as string
   # j is outcome as string
   # choose correct/build correct adjustment set based on exposure and outcome
-  if(grepl("t2_f2", i)){
+  if(grepl("t2_", i)){
     if(grepl("_t2_t3", j)){Wset = W2_F2.W23_anthro}
     else if(grepl("_t2", j)){Wset = W2_F2.W2_anthro}
     else if(grepl("_t3", j)){Wset = W2_F2.W3_anthro}}
-  else if(grepl("slope", i)){Wset = c(W3_salimetrics.W3_anthro, "t3_col_time_z01_cont")}
-  else if(grepl("residual", i)){Wset = W3_salimetrics.W3_anthro}
+  else if(grepl("saa|cort", i)){
+    if(grepl("residual", i)){Wset = W3_salimetrics.W3_anthro}
+    else{Wset = c(W3_salimetrics.W3_anthro, "t3_col_time_z01_cont")}}
   else if(i %in% c("t3_map", "t3_hr_mean")){Wset = W3_vital.W3_anthro}
   else{Wset = W3_oragene.W3_anthro}
   
@@ -116,7 +96,7 @@ pick_covariates <- function(i, j){
 #Secondary Outcome: Change in child WAZ and head circumference-for-age Z score from Year 1 to Year 2
 #Tertiary Outcomes: Change in child WLZ from Year 1 to Year 2
 
-Xvars <- c("t2_f2_8ip", "t2_f2_23d", "t2_f2_VI", "t2_f2_12i", "iso.pca")            
+Xvars <- c("t2_f2_8ip", "t2_f2_23d", "t2_f2_VI", "t2_f2_12i", "t2_iso_pca")            
 Yvars <- c("laz_t2", "waz_t2", "whz_t2" ,"hcz_t2", 
            "len_velocity_t2_t3", "wei_velocity_t2_t3", "hc_velocity_t2_t3",
            "laz_t3", "waz_t3", "whz_t3", "hcz_t3",
@@ -206,7 +186,8 @@ saveRDS(H1_adj_plot_data, paste0(dropboxDir,"results/stress-growth-models/figure
 #Secondary Outcome: Child WAZ and head circumference-for-age Z score at Year 2
 #Tertiary Outcome: Child WLZ at Year 2
 
-Xvars <- c("t3_cort_slope", "t3_residual_cort", "t3_saa_slope", "t3_residual_saa")            
+Xvars <- c("t3_cort_slope", "t3_residual_cort", "t3_cort_z01", "t3_cort_z03",
+           "t3_saa_slope", "t3_residual_saa", "t3_saa_z01", "t3_saa_z02")          
 Yvars <- c("laz_t3", "waz_t3", "whz_t3", "hcz_t3")
 
 #Fit models
