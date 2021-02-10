@@ -173,7 +173,7 @@ summary(dfull$diar7d_t2)
 generate_miss_tbl(Wvars, dfull)
 
 # check with time-varying covariates
-W2_F2.W2_anthro <- c(Wvars, Wvars2_F2 ,Wvars2_anthro) %>% unique(.)
+W2_F2.W2_anthro <- c(Wvars, Wvars2_F2 ,Wvars2_anthro, "laz_t1", "waz_t1") %>% unique(.)
 W2_F2.W3_anthro <- c(Wvars, Wvars2_F2 ,Wvars3_anthro, 
                      "laz_t2", "waz_t2") %>% unique(.)
 W2_F2.W23_anthro <- c(Wvars, Wvars2_F2, Wvars2_anthro, Wvars3_anthro)
@@ -196,6 +196,7 @@ pick_covariates <- function(i, j){
   else{Wset = W3_oragene.W3_anthro}
   
   if(j=="hcz_t3"){Wset=c(Wset, "hcz_t2")}
+  if(j=="hcz_t2"){Wset=c(Wset, "hcz_t1")}
   return(Wset)
 }
 
@@ -239,10 +240,23 @@ levels(dfull$diar7d_t3)[length(levels(dfull$diar7d_t3))]<-"Missing"
 summary(dfull$diar7d_t3)
 
 
-hist(dfull$laz_t2)
-hist(dfull$waz_t2)
-hist(dfull$hcz_t2)
+# create factor variable with missingness level for growth measurements at year 1 and year 2
+growth.var <- c("laz_t1", "waz_t1", "hcz_t1", "laz_t2", "waz_t2", "hcz_t2")
+for (i in growth.var) {
+  cutpoints <- c(-3, -2, -1, -0)  
+  cuts <- c(min(dfull[[i]], na.rm = T), cutpoints, max(dfull[[i]], na.rm = T))
+  new_var <- paste(i, "_cat", sep="")
+  dfull[[new_var]] <- cut(dfull[[i]], 
+                 cuts,
+                 right = FALSE,
+                 include.lowest = TRUE)
+  dfull[[new_var]] <- as.factor(dfull[[new_var]])
+  dfull[[new_var]] <- fct_explicit_na(dfull[[new_var]], "Missing")
+  dfull[[new_var]] <- factor(dfull[[new_var]], levels = levels(dfull[[new_var]]))
+}
 
+# check missingness of categorical growth covariates
+generate_miss_tbl(paste(growth.var, "_cat", sep=""), dfull)
 
 saveRDS(dfull, paste0(dropboxDir,"Data/Cleaned/Andrew/stress_growth_data.RDS"))
 
