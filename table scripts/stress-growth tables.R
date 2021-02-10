@@ -35,6 +35,7 @@ growth_tbl <- function(name, expo_var, out_var, exposure, outcome, results, resu
   tbl <- rbind(tbl, list(" ", " ", " ", " ", " ", 
                          "Predicted Outcome at 25th Percentile", "Predicted Outcome at 75th Percentile", "Coefficient (95% CI)", "P-value", 
                          "Predicted Outcome at 25th Percentile", "Predicted Outcome at 75th Percentile", "Coefficient (95% CI)", "P-value"))
+  skipped<-F
   for (i in 1:length(exposure)) {
     for (j in 1:length(outcome)) {
       exp <- exposure[i]
@@ -43,10 +44,15 @@ growth_tbl <- function(name, expo_var, out_var, exposure, outcome, results, resu
       filtered_adj <- results_adj[results_adj$Y==out & results_adj$X==exp,]
       unadj <- paste(round(filtered_res$`point.diff`, 2), " (", round(filtered_res$`lb.diff`, 2), ", ", round(filtered_res$`ub.diff`, 2), ")", sep="")
       adj <- paste(round(filtered_adj$`point.diff`, 2), " (", round(filtered_adj$`lb.diff`, 2), ", ", round(filtered_adj$`ub.diff`, 2), ")", sep="")
-      if (j==1){
+      if (nrow(filtered_res)==0){
+        skipped<-T
+        next
+      }
+      if(j==1|skipped==T){
         tbl <- rbind(tbl, list(expo_var[i], out_var[j], filtered_res$N, round(filtered_res$q1, 2), round(filtered_res$q3, 2), 
                                round(filtered_res$pred.q1, 2), round(filtered_res$pred.q3, 2), unadj, round(filtered_res$BH.Pval, 2), 
                                round(filtered_adj$pred.q1, 2), round(filtered_adj$pred.q3, 2), adj, round(filtered_adj$BH.Pval, 2)))
+        skipped<-F
       }else {
         tbl <- rbind(tbl, list("", out_var[j],  filtered_res$N, round(filtered_res$q1, 2), round(filtered_res$q3, 2), 
                                round(filtered_res$pred.q1, 2), round(filtered_res$pred.q3, 2), unadj, round(filtered_res$BH.Pval, 2), 
@@ -74,6 +80,7 @@ growth_tbl_flex <- function(name, expo_var, out_var, exposure, outcome, results,
   
   # build table
   tbl <- data.table(matrix(nrow=0, ncol=13))
+  skipped<-F
   for (i in 1:length(exposure)) {
     for (j in 1:length(outcome)) {
       exp <- exposure[i]
@@ -82,10 +89,15 @@ growth_tbl_flex <- function(name, expo_var, out_var, exposure, outcome, results,
       filtered_adj <- results_adj[results_adj$Y==out & results_adj$X==exp,]
       unadj <- paste(round(filtered_res$`point.diff`, 2), " (", round(filtered_res$`lb.diff`, 2), ", ", round(filtered_res$`ub.diff`, 2), ")", sep="")
       adj <- paste(round(filtered_adj$`point.diff`, 2), " (", round(filtered_adj$`lb.diff`, 2), ", ", round(filtered_adj$`ub.diff`, 2), ")", sep="")
-      if (j==1){
+      if (nrow(filtered_res)==0){
+        skipped<-T
+        next
+      }
+      if(j==1|skipped==T){
         tbl <- rbind(tbl, list(expo_var[i], out_var[j],  filtered_res$N, round(filtered_res$q1, 2), round(filtered_res$q3, 2), 
                                round(filtered_res$pred.q1, 2), round(filtered_res$pred.q3, 2), unadj, round(filtered_res$BH.Pval, 2), 
                                round(filtered_adj$pred.q1, 2), round(filtered_adj$pred.q3, 2), adj, round(filtered_adj$BH.Pval, 2)))
+        skipped=F
       }else {
         tbl <- rbind(tbl, list(" ", out_var[j],  filtered_res$N, round(filtered_res$q1, 2), round(filtered_res$q3, 2), 
                                round(filtered_res$pred.q1, 2), round(filtered_res$pred.q3, 2), unadj, round(filtered_res$BH.Pval, 2), 
@@ -117,7 +129,6 @@ growth_tbl_flex <- function(name, expo_var, out_var, exposure, outcome, results,
   
   flextbl
 }
-
 
 
 #### MAIN TABLES ####
@@ -173,7 +184,7 @@ names(tbl1)<- c("","","","n (%) or median (IQR)")
 
 #### Table 2 ####
 
-exposure <- c("t2_f2_8ip", "t2_f2_23d", "t2_f2_VI", "t2_f2_12i", "iso.pca")
+exposure <- c("t2_f2_8ip", "t2_f2_23d", "t2_f2_VI", "t2_f2_12i", "t2_iso_pca")
 outcome <- c("laz_t2", "laz_t3", "len_velocity_t2_t3", "delta_laz_t2_t3")
 expo_var <- c("IPF(2a)-III", "2,3-dinor-iPF(2a)-III", "iPF(2a)-VI", "8,12-iso-iPF(2a)-VI", "Combined urinary oxidative stress biommarkers")
 out_var <- c("LAZ Year 1", "LAZ Year 2", "Length velocity Year 1 and Year 2", "Change in LAZ Year 1 to Year 2")
@@ -183,9 +194,11 @@ tbl2flex <- growth_tbl_flex("Urinary oxidative stress biomarker", expo_var, out_
 
 #### Table 3 ####
 
-exposure <- c("t3_cort_slope", "t3_residual_cort", "t3_saa_slope", "t3_residual_saa")
+exposure <- c("t3_cort_z01", "t3_cort_z03", "t3_cort_slope", "t3_residual_cort", 
+              "t3_saa_z01", "t3_saa_z02", "t3_saa_slope", "t3_residual_saa")
 outcome <- c("laz_t3")
-expo_var <- c("Pre to post-stress change in slope of cortisol", "Cortisol residualized gain score", "Pre to post-stress change in slope of sAA", "sAA residualized gain score")
+expo_var <- c("Pre-stressor cortisol", "Post-stressor cortisol", "Pre to post-stress change in slope of cortisol", "Cortisol residualized gain score", 
+              "Pre-stressor sAA", "Post-stressor sAA", "Pre to post-stress change in slope of sAA", "sAA residualized gain score")
 out_var <- c("LAZ Year 2")
 
 tbl3 <- growth_tbl("Salivary stress biomarker", expo_var, out_var, exposure, outcome, H2, H2adj)
@@ -216,7 +229,7 @@ tbl5flex <- growth_tbl_flex("Methylation site", expo_var, out_var, exposure, out
 #### Supplementary Tables ####
 #### Table S1 ####
 
-exposure <- c("t2_f2_8ip", "t2_f2_23d", "t2_f2_VI", "t2_f2_12i", "iso.pca")
+exposure <- c("t2_f2_8ip", "t2_f2_23d", "t2_f2_VI", "t2_f2_12i", "t2_iso_pca")
 outcome <- c("waz_t2", "whz_t2", "hcz_t2", "waz_t3", "whz_t3", "hcz_t3",
              "wei_velocity_t2_t3", "hc_velocity_t2_t3",
              "delta_waz_t2_t3", "delta_whz_t2_t3", "delta_hcz_t2_t3")
@@ -235,9 +248,11 @@ tbls1flex <- growth_tbl_flex("Urinary oxidative stress biomarker", expo_var, out
 
 #### Table S2 ####
 
-exposure <- c("t3_cort_slope", "t3_residual_cort", "t3_saa_slope", "t3_residual_saa")
+exposure <- c("t3_cort_z01", "t3_cort_z03", "t3_cort_slope", "t3_residual_cort", 
+              "t3_saa_z01", "t3_saa_z02", "t3_saa_slope", "t3_residual_saa")
 outcome <- c("waz_t3", "whz_t3", "hcz_t3")
-expo_var <- c("Pre to post-stress change in slope of cortisol", "Cortisol residualized gain score", "Pre to post-stress change in slope of sAA", "sAA residualized gain score")
+expo_var <- c("Pre-stressor cortisol", "Post-stressor cortisol", "Pre to post-stress change in slope of cortisol", "Cortisol residualized gain score", 
+              "Pre-stressor sAA", "Post-stressor sAA", "Pre to post-stress change in slope of sAA", "sAA residualized gain score")
 out_var <- c("WAZ Year 2", "WLZ Year 2", "HCZ Year 2")
 
 tbls2 <- growth_tbl("Salivary stress biomarker", expo_var, out_var, exposure, outcome, H2, H2adj)
@@ -275,12 +290,12 @@ write.csv(tbl3, here('tables/main/stress-growth-table3.csv'))
 write.csv(tbl4, here('tables/main/stress-growth-table4.csv'))
 write.csv(tbl5, here('tables/main/stress-growth-table5.csv'))
 
-save_as_docx("Table 1" = tbl1flex, "Table 2" = tbl2flex, "Table 3" = tbl3flex, "Table 4" = tbl4flex, "Table 5" = tbl5flex, path='C:/Users/Sophia/Documents/WASH/WASH Stress and Growth/stress-growth main.docx')
+save_as_docx("Table 1" = tbl1flex, "Table 2" = tbl2flex, "Table 3" = tbl3flex, "Table 4" = tbl4flex, "Table 5" = tbl5flex, path='C:/Users/Sophia/Documents/WASH/WASH Stress and Growth/stress-growth main v4.docx')
 
 write.csv(tbls1, here('tables/supplementary/stress-growth-tables1.csv'))
 write.csv(tbls2, here('tables/supplementary/stress-growth-tables2.csv'))
 write.csv(tbls3, here('tables/supplementary/stress-growth-tables3.csv'))
 write.csv(tbls4, here('tables/supplementary/stress-growth-tables4.csv'))
 
-save_as_docx("Table S1" = tbls1flex, "Table S2" = tbls2flex, "Table S3" = tbls3flex, "Table S4" = tbls4flex, path='C:/Users/Sophia/Documents/WASH/WASH Stress and Growth/stress-growth supplementary.docx')
+save_as_docx("Table S1" = tbls1flex, "Table S2" = tbls2flex, "Table S3" = tbls3flex, "Table S4" = tbls4flex, path='C:/Users/Sophia/Documents/WASH/WASH Stress and Growth/stress-growth supplementary v4.docx')
 
