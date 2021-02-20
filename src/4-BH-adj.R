@@ -7,7 +7,7 @@ source(here::here("0-config.R"))
 H1_res <- readRDS(here('results/unadjusted/H1_res.RDS')) 
 H2_res <- readRDS(here('results/unadjusted/H2_res.RDS'))
 H3_res <- readRDS(here('results/unadjusted/H3_res.RDS'))
-H4_res <- readRDS(here('results/unadjusted/H4_res.RDS')) %>% select(-G)
+H4_res <- readRDS(here('results/unadjusted/H4_res.RDS'))
 
 H1_adj_res <- readRDS(here('results/adjusted/H1_adj_res.RDS'))
 H2_adj_res <- readRDS(here('results/adjusted/H2_adj_res.RDS'))
