@@ -1,8 +1,7 @@
 rm(list=ls())
 
-library('flextable')
-library('officer')
 source(here::here("0-config.R"))
+source(here::here("table-functions.R"))
 
 # load enrollment characteristics and results
 d <- read.csv(paste0(dropboxDir, "Data/Cleaned/Audrie/bangladesh-dm-ee-stress-growth-covariates-stresslab-anthro.csv"))
@@ -14,121 +13,6 @@ H1adj <- readRDS(here('results/adjusted/H1_adj_res.RDS'))
 H2adj <- readRDS(here('results/adjusted/H2_adj_res.RDS'))
 H3adj <- readRDS(here('results/adjusted/H3_adj_res.RDS'))
 H4adj <- readRDS(here('results/adjusted/H4_adj_res.RDS'))
-
-
-#### Functions for growth tables ####
-growth_tbl <- function(name, expo_var, out_var, exposure, outcome, results, results_adj){
-  ### name: string name of group of exposures
-  ### expo_var: vector of string exposures to include in table
-  ### out_var: vector of string outcomes to include in table
-  ### exposure: vector of string exposure variable names
-  ### outcome: vector of string outcome variable names
-  ### results: data frame with unadjusted results
-  ### results_adj: data fram with adjusted results
-  
-  ### this function produces a table that can be saved as a csv
-  
-  tbl <- data.table(name = character(), "Outcome" = character(), "N" = character(), "25th Percentile" = character(), "75th Percentile" = character(),
-                    " Outcome, 75th Percentile v. 25th Percentile" = character(), " " = character(), " " = character(), " " = character(), " " = character(),
-                    " " = character(), " " = character(), " " = character(), " " = character(), " " = character())
-  tbl <- rbind(tbl, list(" ", " ", " ", " ", " ", "Unadjusted", " ", " ", " ", " ", "Fully adjusted", " ", " ", " ", " "))
-  tbl <- rbind(tbl, list(" ", " ", " ", " ", " ", 
-                         "Predicted Outcome at 25th Percentile", "Predicted Outcome at 75th Percentile", "Coefficient (95% CI)", "P-value", "FDR adjusted P-value", 
-                         "Predicted Outcome at 25th Percentile", "Predicted Outcome at 75th Percentile", "Coefficient (95% CI)", "P-value", "FDR adjusted P-value"))
-  skipped<-F
-  for (i in 1:length(exposure)) {
-    for (j in 1:length(outcome)) {
-      exp <- exposure[i]
-      out <- outcome[j]
-      filtered_res <- results[results$Y==out & results$X==exp,]
-      filtered_adj <- results_adj[results_adj$Y==out & results_adj$X==exp,]
-      unadj <- paste(round(filtered_res$`point.diff`, 2), " (", round(filtered_res$`lb.diff`, 2), ", ", round(filtered_res$`ub.diff`, 2), ")", sep="")
-      adj <- paste(round(filtered_adj$`point.diff`, 2), " (", round(filtered_adj$`lb.diff`, 2), ", ", round(filtered_adj$`ub.diff`, 2), ")", sep="")
-      if (nrow(filtered_res)==0){
-        skipped<-T
-        next
-      }
-      if(j==1|skipped==T){
-        tbl <- rbind(tbl, list(expo_var[i], out_var[j], filtered_res$N, round(filtered_res$q1, 2), round(filtered_res$q3, 2), 
-                               round(filtered_res$pred.q1, 2), round(filtered_res$pred.q3, 2), unadj, round(filtered_res$Pval, 2), round(filtered_res$BH.Pval, 2), 
-                               round(filtered_adj$pred.q1, 2), round(filtered_adj$pred.q3, 2), adj, round(filtered_adj$Pval, 2), round(filtered_adj$BH.Pval, 2)))
-        skipped<-F
-      }else {
-        tbl <- rbind(tbl, list("", out_var[j],  filtered_res$N, round(filtered_res$q1, 2), round(filtered_res$q3, 2), 
-                               round(filtered_res$pred.q1, 2), round(filtered_res$pred.q3, 2), unadj, round(filtered_res$Pval, 2), round(filtered_res$BH.Pval, 2), 
-                               round(filtered_adj$pred.q1, 2), round(filtered_adj$pred.q3, 2), adj, round(filtered_adj$Pval, 2), round(filtered_adj$BH.Pval, 2)))
-      }
-    }
-    if (i != length(exposure)) {
-      tbl <- rbind(tbl, list("","","","","","","","","","","","","","",""))
-    }
-  }
-  tbl
-}
-
-growth_tbl_flex <- function(name, expo_var, out_var, exposure, outcome, results, results_adj){
-  ### name: string name of group of exposures
-  ### expo_var: vector of string exposures to include in table
-  ### out_var: vector of string outcomes to include in table
-  ### exposure: vector of string exposure variable names
-  ### outcome: vector of string outcome variable names
-  ### results: data frame with unadjusted results
-  ### results_adj: data fram with adjusted results
-  
-  ### this function produces a table that can be saved as an image or 
-  ### directly to a word document!
-  
-  # build table
-  tbl <- data.table(matrix(nrow=0, ncol=15))
-  skipped<-F
-  for (i in 1:length(exposure)) {
-    for (j in 1:length(outcome)) {
-      exp <- exposure[i]
-      out <- outcome[j]
-      filtered_res <- results[results$Y==out & results$X==exp,]
-      filtered_adj <- results_adj[results_adj$Y==out & results_adj$X==exp,]
-      unadj <- paste(round(filtered_res$`point.diff`, 2), " (", round(filtered_res$`lb.diff`, 2), ", ", round(filtered_res$`ub.diff`, 2), ")", sep="")
-      adj <- paste(round(filtered_adj$`point.diff`, 2), " (", round(filtered_adj$`lb.diff`, 2), ", ", round(filtered_adj$`ub.diff`, 2), ")", sep="")
-      if (nrow(filtered_res)==0){
-        skipped<-T
-        next
-      }
-      if(j==1|skipped==T){
-        tbl <- rbind(tbl, list(expo_var[i], out_var[j],  filtered_res$N, round(filtered_res$q1, 2), round(filtered_res$q3, 2), 
-                               round(filtered_res$pred.q1, 2), round(filtered_res$pred.q3, 2), unadj, round(filtered_res$Pval, 2), round(filtered_res$BH.Pval, 2), 
-                               round(filtered_adj$pred.q1, 2), round(filtered_adj$pred.q3, 2), adj, round(filtered_adj$Pval, 2), round(filtered_adj$BH.Pval, 2)))
-        skipped=F
-      }else {
-        tbl <- rbind(tbl, list(" ", out_var[j],  filtered_res$N, round(filtered_res$q1, 2), round(filtered_res$q3, 2), 
-                               round(filtered_res$pred.q1, 2), round(filtered_res$pred.q3, 2), unadj, round(filtered_res$Pval, 2), round(filtered_res$BH.Pval, 2), 
-                               round(filtered_adj$pred.q1, 2), round(filtered_adj$pred.q3, 2), adj, round(filtered_adj$Pval, 2), round(filtered_adj$BH.Pval, 2)))
-      }
-    }
-    if (i != length(exposure)) {
-      tbl <- rbind(tbl, list("","","","","","","","", "","","","","","",""))
-    }
-  }
-  
-  # format for export
-  flextbl<-flextable(tbl, col_keys=names(tbl))
-  flextbl <- set_header_labels(flextbl,
-                               values = list("V1" = " ", "V2" = " ", "V3" = " ", "V4" = " ", "V5" = " ",
-                                             "V6" = "Predicted Outcome at 25th Percentile", "V7" = "Predicted Outcome at 75th Percentile", "V8" = "Coefficient (95% CI)", "V9" = "P-value", "V10" = "FDR Corrected P-value",
-                                             "V11" = "Predicted Outcome at 25th Percentile", "V12" = "Predicted Outcome at 75th Percentile", "V13" = "Coefficient (95% CI)", "V14" = "P-value", "V15" = "FDR Corrected P-value"))
-  flextbl <- add_header_row(flextbl, values = c("","","","","", "Unadjusted", "Fully adjusted"), colwidths=c(1,1,1,1,1,5,5))
-  # flextbl <- hline_top(flextbl, part="header", border=fp_border(color="black"))
-  flextbl <- add_header_row(flextbl, values = c(name, "Outcome","N","25th Percentile","75th Percentile", "Outcome, 75th Percentile v. 25th Percentile"), colwidths=c(1,1,1,1,1,10))
-  # flextbl <- hline_top(flextbl, part="header", border=fp_border(color="black"))
-  flextbl <- hline(flextbl, part="header", border=fp_border(color="black"))
-  flextbl <- hline_bottom(flextbl, part="body", border=fp_border(color="black"))
-  flextbl <- hline_top(flextbl, part="header", border=fp_border(color="black"))
-  flextbl <- align(flextbl, align = "center", part = "all")
-  flextbl <- align(flextbl, j = c(1, 2), align = "left", part="all")
-  flextbl <- autofit(flextbl, part = "all")
-  flextbl <- fit_to_width(flextbl, max_width=8)
-  
-  flextbl
-}
 
 
 #### MAIN TABLES ####
@@ -185,101 +69,118 @@ names(tbl1)<- c("","","","n (%) or median (IQR)")
 #### Table 2 ####
 
 exposure <- c("t2_f2_8ip", "t2_f2_23d", "t2_f2_VI", "t2_f2_12i", "t2_iso_pca")
-outcome <- c("laz_t2", "laz_t3", "len_velocity_t2_t3", "delta_laz_t2_t3")
-expo_var <- c("IPF(2a)-III", "2,3-dinor-iPF(2a)-III", "iPF(2a)-VI", "8,12-iso-iPF(2a)-VI", "Combined urinary oxidative stress biommarkers")
-out_var <- c("LAZ Year 1", "LAZ Year 2", "Length velocity Year 1 and Year 2", "Change in LAZ Year 1 to Year 2")
+outcome <- c("laz_t2", "waz_t2", "whz_t2", "hcz_t2", "laz_t3", "waz_t3", "whz_t3", "hcz_t3",
+             "len_velocity_t2_t3", "wei_velocity_t2_t3", "hc_velocity_t2_t3",
+             "delta_laz_t2_t3", "delta_waz_t2_t3", "delta_whz_t2_t3", "delta_hcz_t2_t3")
+expo_var <- c("IPF(2a)-III", "2,3-dinor-iPF(2a)-III", "iPF(2a)-VI", "8,12-iso-iPF(2a)-VI", "Combined urinary oxidative stress biomarkers")
+out_var <- c("LAZ Year 1", "WAZ Year 1", "WLZ Year 1", "HCZ Year 1",
+             "LAZ Year 2", "WAZ Year 2", "WLZ Year 2", "HCZ Year 2",
+             "Length velocity (cm/month) Year 1 to Year 2", "Weight velocity (kg/month) Year 1 to Year 2",
+             "Head circumference velocity (cm/month) Year 1 to Year 2",
+             "Change in LAZ from Year 1 to Year 2", 
+             "Change in WAZ from Year 1 to Year 2",
+             "Change in WLZ from Year 1 to Year 2",
+             "Change in HCZ from Year 1 to Year 2")
 
-tbl2 <- growth_tbl("Urinary oxidative stress biomarker", expo_var, out_var, exposure, outcome, H1, H1adj)
-tbl2flex <- growth_tbl_flex("Urinary oxidative stress biomarker", expo_var, out_var, exposure, outcome, H1, H1adj)
+tbl2 <- growth_tbl("Urinary oxidative stress biomarker", expo_var, out_var, exposure, outcome, H1, H1adj, T)
+tbl2flex <- growth_tbl_flex("Urinary oxidative stress biomarker", expo_var, out_var, exposure, outcome, H1, H1adj, T)
+tbl1supp <- growth_tbl("Urinary oxidative stress biomarker", expo_var, out_var, exposure, outcome, H1, H1adj)
+tbl1flexsupp <- growth_tbl_flex("Urinary oxidative stress biomarker", expo_var, out_var, exposure, outcome, H1, H1adj)
 
 #### Table 3 ####
 
 exposure <- c("t3_cort_z01", "t3_cort_z03", "t3_cort_slope", "t3_residual_cort", 
               "t3_saa_z01", "t3_saa_z02", "t3_saa_slope", "t3_residual_saa")
-outcome <- c("laz_t3")
-expo_var <- c("Pre-stressor cortisol", "Post-stressor cortisol", "Pre to post-stress change in slope of cortisol", "Cortisol residualized gain score", 
-              "Pre-stressor sAA", "Post-stressor sAA", "Pre to post-stress change in slope of sAA", "sAA residualized gain score")
-out_var <- c("LAZ Year 2")
+outcome <- c("laz_t3", "waz_t3", "whz_t3", "hcz_t3")
+expo_var <- c("Pre-stressor cortisol", "Post-stressor cortisol", "Pre to post-stress change in cortisol", "Cortisol residualized gain score", 
+              "Pre-stressor sAA", "Post-stressor sAA", "Pre to post-stress change in sAA", "sAA residualized gain score")
+out_var <- c("LAZ Year 2", "WAZ Year 2", "WLZ Year 2", "HCZ Year 2")
 
-tbl3 <- growth_tbl("Salivary stress biomarker", expo_var, out_var, exposure, outcome, H2, H2adj)
-tbl3flex <- growth_tbl_flex("Salivary stress biomarker", expo_var, out_var, exposure, outcome, H2, H2adj)
+tbl3 <- growth_tbl("Salivary stress biomarker", expo_var, out_var, exposure, outcome, H2, H2adj, T)
+tbl3flex <- growth_tbl_flex("Salivary stress biomarker", expo_var, out_var, exposure, outcome, H2, H2adj, T)
+tbl2supp <- growth_tbl("Salivary stress biomarker", expo_var, out_var, exposure, outcome, H2, H2adj)
+tbl2flexsupp <- growth_tbl_flex("Salivary stress biomarker", expo_var, out_var, exposure, outcome, H2, H2adj)
 
 #### Table 4 ####
 
 exposure <- c("t3_map", "t3_hr_mean")
-outcome <- c("laz_t3")
+outcome <- c("laz_t3", "waz_t3", "whz_t3", "hcz_t3")
 expo_var <- c("Mean arterial pressure", "Mean resting heart rate")
-out_var <- c("LAZ Year 2")
+out_var <- c("LAZ Year 2", "WAZ Year 2", "WLZ Year 2", "HCZ Year 2")
 
-tbl4 <- growth_tbl("Resting SAM biomarker", expo_var, out_var, exposure, outcome, H3, H3adj)
-tbl4flex <- growth_tbl_flex("Resting SAM biomarker", expo_var, out_var, exposure, outcome, H3, H3adj)
+tbl4 <- growth_tbl("Resting SAM biomarker", expo_var, out_var, exposure, outcome, H3, H3adj, T)
+tbl4flex <- growth_tbl_flex("Resting SAM biomarker", expo_var, out_var, exposure, outcome, H3, H3adj, T)
+tbl3supp <- growth_tbl("Resting SAM biomarker", expo_var, out_var, exposure, outcome, H3, H3adj)
+tbl3flexsupp <- growth_tbl_flex("Resting SAM biomarker", expo_var, out_var, exposure, outcome, H3, H3adj)
 
 
 #### Table 5 ####
 
 exposure <- c("t3_gcr_mean", "t3_gcr_cpg12")
-outcome <- c("laz_t3")
+outcome <- c("laz_t3", "waz_t3", "whz_t3", "hcz_t3")
 expo_var <- c("Entire promoter region (39 assayed CpG sites)", "NGFI-A transcription factor binding site (CpG site #12)")
-out_var <- c("LAZ Year 2")
+out_var <- c("LAZ Year 2", "WAZ Year 2", "WLZ Year 2", "HCZ Year 2")
 
-tbl5 <- growth_tbl("Methylation site", expo_var, out_var, exposure, outcome, H4, H4adj)
-tbl5flex <- growth_tbl_flex("Methylation site", expo_var, out_var, exposure, outcome, H4, H4adj)
-
-
-#### Supplementary Tables ####
-#### Table S1 ####
-
-exposure <- c("t2_f2_8ip", "t2_f2_23d", "t2_f2_VI", "t2_f2_12i", "t2_iso_pca")
-outcome <- c("waz_t2", "whz_t2", "hcz_t2", "waz_t3", "whz_t3", "hcz_t3",
-             "wei_velocity_t2_t3", "hc_velocity_t2_t3",
-             "delta_waz_t2_t3", "delta_whz_t2_t3", "delta_hcz_t2_t3")
-expo_var <- c("IPF(2a)-III", "2,3-dinor-iPF(2a)-III", "iPF(2a)-VI", "8,12-iso-iPF(2a)-VI", "Combined urinary oxidative stress biommarkers")
-out_var <- c("WAZ Year 1", "WLZ Year 1", "HCZ Year 1",
-             "WAZ Year 2", "WLZ Year 2", "HCZ Year 2",
-             "Weight velocity (kg/month) Year 1 to Year 2",
-             "Head circumference velocity (cm/month) Year 1 to Year 2",
-             "Change in child WAZ from Year 1 to Year 2",
-             "Change in WLZ from Year 1 to Year 2",
-             "Change in HCZ from Year 1 to Year 2")
-
-tbls1 <- growth_tbl("Urinary oxidative stress biomarker", expo_var, out_var, exposure, outcome, H1, H1adj)
-tbls1flex <- growth_tbl_flex("Urinary oxidative stress biomarker", expo_var, out_var, exposure, outcome, H1, H1adj)
+tbl5 <- growth_tbl("Methylation site", expo_var, out_var, exposure, outcome, H4, H4adj, T)
+tbl5flex <- growth_tbl_flex("Methylation site", expo_var, out_var, exposure, outcome, H4, H4adj, T)
+tbl4supp <- growth_tbl("Methylation site", expo_var, out_var, exposure, outcome, H4, H4adj)
+tbl4flexsupp <- growth_tbl_flex("Methylation site", expo_var, out_var, exposure, outcome, H4, H4adj)
 
 
-#### Table S2 ####
-
-exposure <- c("t3_cort_z01", "t3_cort_z03", "t3_cort_slope", "t3_residual_cort", 
-              "t3_saa_z01", "t3_saa_z02", "t3_saa_slope", "t3_residual_saa")
-outcome <- c("waz_t3", "whz_t3", "hcz_t3")
-expo_var <- c("Pre-stressor cortisol", "Post-stressor cortisol", "Pre to post-stress change in slope of cortisol", "Cortisol residualized gain score", 
-              "Pre-stressor sAA", "Post-stressor sAA", "Pre to post-stress change in slope of sAA", "sAA residualized gain score")
-out_var <- c("WAZ Year 2", "WLZ Year 2", "HCZ Year 2")
-
-tbls2 <- growth_tbl("Salivary stress biomarker", expo_var, out_var, exposure, outcome, H2, H2adj)
-tbls2flex <- growth_tbl_flex("Salivary stress biomarker", expo_var, out_var, exposure, outcome, H2, H2adj)
-
-
-#### Table S3 ####
-
-exposure <- c("t3_map", "t3_hr_mean")
-outcome <- c("waz_t3", "whz_t3", "hcz_t3")
-expo_var <- c("Mean arterial pressure", "Mean resting heart rate")
-out_var <- c("WAZ Year 2", "WLZ Year 2", "HCZ Year 2")
-
-tbls3 <- growth_tbl("Resting SAM biomarker", expo_var, out_var, exposure, outcome, H3, H3adj)
-tbls3flex <- growth_tbl_flex("Resting SAM biomarker", expo_var, out_var, exposure, outcome, H3, H3adj)
-
-
-
-#### Table S4 ####
-
-exposure <- c("t3_gcr_mean", "t3_gcr_cpg12")
-outcome <- c("waz_t3", "whz_t3", "hcz_t3")
-expo_var <- c("Entire promoter region (39 assayed CpG sites)", "NGFI-A transcription factor binding site (CpG site #12)")
-out_var <- c("WAZ Year 2", "WLZ Year 2", "HCZ Year 2")
-
-tbls4 <- growth_tbl("Methylation site", expo_var, out_var, exposure, outcome, H4, H4adj)
-tbls4flex <- growth_tbl_flex("Methylation site", expo_var, out_var, exposure, outcome, H4, H4adj)
+# #### Supplementary Tables ####
+# #### Table S1 ####
+# 
+# exposure <- c("t2_f2_8ip", "t2_f2_23d", "t2_f2_VI", "t2_f2_12i", "t2_iso_pca")
+# outcome <- c("waz_t2", "whz_t2", "hcz_t2", "waz_t3", "whz_t3", "hcz_t3",
+#              "wei_velocity_t2_t3", "hc_velocity_t2_t3",
+#              "delta_waz_t2_t3", "delta_whz_t2_t3", "delta_hcz_t2_t3")
+# expo_var <- c("IPF(2a)-III", "2,3-dinor-iPF(2a)-III", "iPF(2a)-VI", "8,12-iso-iPF(2a)-VI", "Combined urinary oxidative stress biomarkers")
+# out_var <- c("WAZ Year 1", "WLZ Year 1", "HCZ Year 1",
+#              "WAZ Year 2", "WLZ Year 2", "HCZ Year 2",
+#              "Weight velocity (kg/month) Year 1 to Year 2",
+#              "Head circumference velocity (cm/month) Year 1 to Year 2",
+#              "Change in child WAZ from Year 1 to Year 2",
+#              "Change in WLZ from Year 1 to Year 2",
+#              "Change in HCZ from Year 1 to Year 2")
+# 
+# tbls1 <- growth_tbl("Urinary oxidative stress biomarker", expo_var, out_var, exposure, outcome, H1, H1adj)
+# tbls1flex <- growth_tbl_flex("Urinary oxidative stress biomarker", expo_var, out_var, exposure, outcome, H1, H1adj)
+# 
+# 
+# #### Table S2 ####
+# 
+# exposure <- c("t3_cort_z01", "t3_cort_z03", "t3_cort_slope", "t3_residual_cort", 
+#               "t3_saa_z01", "t3_saa_z02", "t3_saa_slope", "t3_residual_saa")
+# outcome <- c("waz_t3", "whz_t3", "hcz_t3")
+# expo_var <- c("Pre-stressor cortisol", "Post-stressor cortisol", "Pre to post-stress change in slope of cortisol", "Cortisol residualized gain score", 
+#               "Pre-stressor sAA", "Post-stressor sAA", "Pre to post-stress change in slope of sAA", "sAA residualized gain score")
+# out_var <- c("WAZ Year 2", "WLZ Year 2", "HCZ Year 2")
+# 
+# tbls2 <- growth_tbl("Salivary stress biomarker", expo_var, out_var, exposure, outcome, H2, H2adj)
+# tbls2flex <- growth_tbl_flex("Salivary stress biomarker", expo_var, out_var, exposure, outcome, H2, H2adj)
+# 
+# 
+# #### Table S3 ####
+# 
+# exposure <- c("t3_map", "t3_hr_mean")
+# outcome <- c("waz_t3", "whz_t3", "hcz_t3")
+# expo_var <- c("Mean arterial pressure", "Mean resting heart rate")
+# out_var <- c("WAZ Year 2", "WLZ Year 2", "HCZ Year 2")
+# 
+# tbls3 <- growth_tbl("Resting SAM biomarker", expo_var, out_var, exposure, outcome, H3, H3adj)
+# tbls3flex <- growth_tbl_flex("Resting SAM biomarker", expo_var, out_var, exposure, outcome, H3, H3adj)
+# 
+# 
+# 
+# #### Table S4 ####
+# 
+# exposure <- c("t3_gcr_mean", "t3_gcr_cpg12")
+# outcome <- c("waz_t3", "whz_t3", "hcz_t3")
+# expo_var <- c("Entire promoter region (39 assayed CpG sites)", "NGFI-A transcription factor binding site (CpG site #12)")
+# out_var <- c("WAZ Year 2", "WLZ Year 2", "HCZ Year 2")
+# 
+# tbls4 <- growth_tbl("Methylation site", expo_var, out_var, exposure, outcome, H4, H4adj)
+# tbls4flex <- growth_tbl_flex("Methylation site", expo_var, out_var, exposure, outcome, H4, H4adj)
 
 
 #### SAVE TABLES ####
@@ -290,12 +191,12 @@ write.csv(tbl3, here('tables/main/stress-growth-table3.csv'))
 write.csv(tbl4, here('tables/main/stress-growth-table4.csv'))
 write.csv(tbl5, here('tables/main/stress-growth-table5.csv'))
 
-save_as_docx("Table 1" = tbl1flex, "Table 2" = tbl2flex, "Table 3" = tbl3flex, "Table 4" = tbl4flex, "Table 5" = tbl5flex, path='C:/Users/Sophia/Documents/WASH/WASH Stress and Growth/stress-growth main v4.docx')
+save_as_docx("Table 1" = tbl1flex, "Table 2" = tbl2flex, "Table 3" = tbl3flex, "Table 4" = tbl4flex, "Table 5" = tbl5flex, path='C:/Users/Sophia/Documents/WASH/WASH Stress and Growth/stress-growth main v5.docx')
 
-write.csv(tbls1, here('tables/supplementary/stress-growth-tables1.csv'))
-write.csv(tbls2, here('tables/supplementary/stress-growth-tables2.csv'))
-write.csv(tbls3, here('tables/supplementary/stress-growth-tables3.csv'))
-write.csv(tbls4, here('tables/supplementary/stress-growth-tables4.csv'))
+write.csv(tbl1supp, here('tables/supplementary/stress-growth-tables1.csv'))
+write.csv(tbl2supp, here('tables/supplementary/stress-growth-tables2.csv'))
+write.csv(tbl3supp, here('tables/supplementary/stress-growth-tables3.csv'))
+write.csv(tbl4supp, here('tables/supplementary/stress-growth-tables4.csv'))
 
-save_as_docx("Table S1" = tbls1flex, "Table S2" = tbls2flex, "Table S3" = tbls3flex, "Table S4" = tbls4flex, path='C:/Users/Sophia/Documents/WASH/WASH Stress and Growth/stress-growth supplementary v4.docx')
+save_as_docx("Table S1" = tbl1flexsupp, "Table S2" = tbl2flexsupp, "Table S3" = tbl3flexsupp, "Table S4" = tbl4flexsupp, path='C:/Users/Sophia/Documents/WASH/WASH Stress and Growth/stress-growth supplementary v5.docx')
 
