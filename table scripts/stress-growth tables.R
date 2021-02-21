@@ -227,7 +227,7 @@ write.csv(tbl7, here('tables/main/stress-growth-table7.csv'))
 write.csv(tbl8, here('tables/main/stress-growth-table8.csv'))
 
 save_as_docx("Table 1" = tbl1flex, "Table 2" = tbl2flex, "Table 3" = tbl3flex, "Table 4" = tbl4flex, 
-             "Table 5" = tbl5flex, "Table 6" = tbl5flex, "Table 7" = tbl5flex, "Table 8" = tbl5flex, 
+             "Table 5" = tbl5flex, "Table 6" = tbl6flex, "Table 7" = tbl7flex, "Table 8" = tbl8flex, 
              path='C:/Users/Sophia/Documents/WASH/WASH Stress and Growth/stress-growth main v6.docx')
 
 write.csv(tbl1supp, here('tables/supplementary/stress-growth-tables1.csv'))
