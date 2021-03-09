@@ -4,7 +4,7 @@ source(here::here("0-config.R"))
 source(here::here("table-functions.R"))
 
 # load enrollment characteristics and results
-d <- read.csv(paste0(dropboxDir, "Data/Cleaned/Audrie/bangladesh-dm-ee-stress-growth-covariates-stresslab-anthro.csv"))
+d <- read.csv(paste0(dropboxDir, "Data/Cleaned/Audrie/bangladesh-dm-ee-stress-growth-covariates-stresslab-anthro (2).csv"))
 H1 <- readRDS(here('results/unadjusted/H1_res.RDS'))
 H2 <- readRDS(here('results/unadjusted/H2_res.RDS'))
 H3 <- readRDS(here('results/unadjusted/H3_res.RDS'))
@@ -228,7 +228,7 @@ write.csv(tbl8, here('tables/main/stress-growth-table8.csv'))
 
 save_as_docx("Table 1" = tbl1flex, "Table 2" = tbl2flex, "Table 3" = tbl3flex, "Table 4" = tbl4flex, 
              "Table 5" = tbl5flex, "Table 6" = tbl6flex, "Table 7" = tbl7flex, "Table 8" = tbl8flex, 
-             path='C:/Users/Sophia/Documents/WASH/WASH Stress and Growth/stress-growth main v6.docx')
+             path='C:/Users/Sophia/Documents/WASH/WASH Stress and Growth/stress-growth main v8.docx')
 
 write.csv(tbl1supp, here('tables/supplementary/stress-growth-tables1.csv'))
 write.csv(tbl2supp, here('tables/supplementary/stress-growth-tables2.csv'))
@@ -241,5 +241,5 @@ write.csv(tbl7supp, here('tables/supplementary/stress-growth-tables7.csv'))
 
 save_as_docx("Table S1" = tbl1flexsupp, "Table S2" = tbl2flexsupp, "Table S3" = tbl3flexsupp, 
              "Table S4" = tbl4flexsupp, "Table S5" = tbl5flexsupp, "Table S6" = tbl6flexsupp, "Table S7" = tbl7flexsupp, 
-             path='C:/Users/Sophia/Documents/WASH/WASH Stress and Growth/stress-growth supplementary v6.docx')
+             path='C:/Users/Sophia/Documents/WASH/WASH Stress and Growth/stress-growth supplementary v8.docx')
 
