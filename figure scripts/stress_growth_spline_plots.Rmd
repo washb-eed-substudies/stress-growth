@@ -1,0 +1,57 @@
+---
+title: "Stress-Growth Spline Plots"
+author: "Andrew Mertens"
+date: "10/26/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+rm(list=ls())
+source(here::here("0-config.R"))
+
+
+```
+
+```{r, echo=F}
+H1 <- readRDS("C:/Users/andre/Dropbox/WASHB-EE-analysis/WBB-EE-analysis/results/stress-growth-models/figure-objects/H1_adj_splines.RDS")
+gc()
+for(i in 1:length(H1)){
+  print(H1[[i]])
+}
+
+rm(H1)
+
+```
+
+```{r, echo=F}
+H2 <- readRDS("C:/Users/andre/Dropbox/WASHB-EE-analysis/WBB-EE-analysis/results/stress-growth-models/figure-objects/H2_adj_splines.RDS")
+gc()
+for(i in 1:length(H2)){
+  print(H2[[i]])
+}
+
+rm(H2)
+
+```
+
+```{r, echo=F}
+H3 <- readRDS("C:/Users/andre/Dropbox/WASHB-EE-analysis/WBB-EE-analysis/results/stress-growth-models/figure-objects/H3_adj_splines.RDS")
+gc()
+for(i in 1:length(H3)){
+  print(H3[[i]])
+}
+
+rm(H3)
+
+```
+
+```{r, echo=F}
+H4 <- readRDS("C:/Users/andre/Dropbox/WASHB-EE-analysis/WBB-EE-analysis/results/stress-growth-models/figure-objects/H4_adj_splines.RDS")
+gc()
+for(i in 1:length(H4)){
+  print(H4[[i]])
+}
+
+rm(H4)
+
+```
