@@ -1,35 +1,579 @@
 ---
-title: "EE lab presentation"
+title: "WASH Benefits Bangladesh Analysis of Stress Biomarkers and Growth Outcomes"
 author: "Andrew Mertens"
-date: "12/6/2021"
-output: ioslides_presentation
+date: "12/7/2021"
+output:
+  ioslides_presentation:
+    incremental: true
+    smaller: true
+    theme: paper
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
+
+library(tidyverse)
+library(knitr)
+library(here)
+
+theme_ki<-function(){
+  theme_bw() %+replace%
+    theme(
+      strip.background = element_blank(),
+      legend.position="none",
+      plot.title = element_text(size = 16, face = "bold"),
+      strip.text = element_text(size=14),
+      axis.title = element_text(size=12),
+      axis.text.y = element_text(size=10),
+      axis.text.x = element_text(size=10, angle = 0, hjust = 0.5, vjust=.1)
+    )
+}
+
+theme_set(theme_ki())
+
+tableau10 <- c("#1F77B4","#FF7F0E","#2CA02C","#D62728",
+               "#9467BD","#8C564B","#E377C2","#7F7F7F",
+               "#BCBD22","#17BECF")
+
+dropboxDir <- "C:/Users/andre/Dropbox/WASHB-EE-analysis/WBB-EE-analysis/"
+
+# H4_models <- readRDS(paste0(dropboxDir,"results/stress-growth-models/models/adj_H4_models.RDS"))
+# H4_plot_data <- readRDS(paste0(dropboxDir,"results/stress-growth-models/figure-data/H4_adj_spline_data.RDS"))  
+
+H1_res <- readRDS(paste0(here::here(),"/results/adjusted/H1_adj_res.RDS"))
+#H1_plot_list <- readRDS(paste0(dropboxDir,"results/stress-growth-models/figure-objects/H1_adj_splines.RDS"))
+H2_res <- readRDS(paste0(here::here(),"/results/adjusted/H2_adj_res.RDS"))
+#H2_plot_list <- readRDS(paste0(dropboxDir,"results/stress-growth-models/figure-objects/H2_adj_splines.RDS"))
+H3_res <- readRDS(paste0(here::here(),"/results/adjusted/H3_adj_res.RDS"))
+#H3_plot_list <- readRDS(paste0(dropboxDir,"results/stress-growth-models/figure-objects/H3_adj_splines.RDS"))
+H4_res <- readRDS(paste0(here::here(),"/results/adjusted/H4_adj_res.RDS"))
+#H4_plot_list <- readRDS(paste0(dropboxDir,"results/stress-growth-models/figure-objects/H4_adj_splines.RDS"))
+
+H1_plot_data <- readRDS(paste0(dropboxDir,"results/stress-growth-models/figure-data/H1_adj_spline_data.RDS"))
+H2_plot_data <- readRDS(paste0(dropboxDir,"results/stress-growth-models/figure-data/H2_adj_spline_data.RDS"))
+H3_plot_data <- readRDS(paste0(dropboxDir,"results/stress-growth-models/figure-data/H3_adj_spline_data.RDS"))
+H4_plot_data <- readRDS(paste0(dropboxDir,"results/stress-growth-models/figure-data/H4_adj_spline_data.RDS"))
+
+
+
+
+tbl2 <- read.csv(here('tables/main/stress-growth-table2.csv'))
+
+tbl2 <- tbl2[,-c(1,4:8)]
+colnames(tbl2)[c(3,4)] <- c("Coefficient (95% CI)", "P-value")
+tbl2 <- tbl2 %>% filter(Outcome!="",Outcome!=" ", grepl("\\*",`P-value`))
+
+
+
+d<-readRDS(paste0(dropboxDir, "Data/Cleaned/Andrew/stress_growth_data.RDS"))
+
+
+d <- d %>% select(childid, t2_f2_23d, t2_f2_23d_raw, laz_t1,laz_t2,laz_t3)
+d1 <- d %>% select(childid, t2_f2_23d, t2_f2_23d_raw, laz_t1) %>% rename(laz=laz_t1) %>% mutate(time="3 months")
+d2 <- d %>% select(childid, t2_f2_23d, t2_f2_23d_raw, laz_t2) %>% rename(laz=laz_t2) %>% mutate(time="14 months")
+d3 <- d %>% select(childid, t2_f2_23d, t2_f2_23d_raw, laz_t3) %>% rename(laz=laz_t3) %>% mutate(time="28 months")
+
+d <- bind_rows(d1,d2,d3) %>% mutate(time=factor(time, levels=c("3 months","14 months","28 months"))) %>%
+  filter(!is.na(t2_f2_23d))
+
+#df <- d %>% filter(time!="3 months") %>% group_by(childid) %>% mutate(N=n()) %>% filter(N==2)
+df <- d %>% #filter(time!="3 months") %>% 
+  group_by(childid) %>% mutate(N=n()) %>% filter(N==3)
+df <- df %>% ungroup() %>% mutate(f2_cat=ntile(t2_f2_23d,4))
+df2 <- df %>% group_by(childid) %>% mutate(delta_laz=round(last(laz)-first(laz),2))
+
+
+p_rtm<- ggplot(df2, aes(x=as.numeric(time), y=laz, color=delta_laz)) + 
+  #geom_path(aes(group=childid), alpha=0.15, size=1, position = position_dodge(0.4)) +
+  geom_point(aes(group=childid), height=0, alpha=0.5, position = position_dodge(0.1)) +
+  geom_smooth() +
+  facet_wrap(~f2_cat, nrow = 1) + 
+  coord_cartesian(ylim=c(-3,1)) +
+  scale_color_continuous(type = "viridis")
+
+
+
 ```
 
-## R Markdown
 
-This is an R Markdown presentation. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+## Motivation
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document.
+- Children who experience growth failure may never reach their maximum possible cognitive development and growth failure is associated with increased risk of mortality or long-term morbidity.
+-  Globally, 151 million children under 5 years of age are stunted (low height for age).
+-  Prenatal development and the first 2 years of life represent a particularly critical window for linear and ponderal growth.
 
-## Slide with Bullets
+## Background
 
-- Bullet 1
-- Bullet 2
-- Bullet 3
+- Chronic biological stress can impair development during critical windows of growth. 
+  - Stressful stimuli are associated with the set point, reactivity, and regulation of the two primary neuroendocrine axes, the sympathetic adrenomedullary (SAM) and the hypothalamic-pituitary- adrenal (HPA) axes.
+  - Activation of the SAM leads to increased blood pressure and heart rate as well as production of salivary amylase (sAA).
+  - The HPA axis modulates the sympathetic nervous system through the production of glucocorticoids, catecholamines, and cytokines. 
+  - The production of cytokines activates the HPA axis, which responds by producing glucocorticoids that inhibit the HPA axis and immune activity.
 
-## Slide with R Output
 
-```{r cars, echo = TRUE}
-summary(cars)
+## Background
+
+- Cortisol is a glucocorticoid that is particularly important to the stress response and follows a diurnal, circadian rhythm. 
+  - In children, chronic stress is associated with disruption of diurnal rhythm of cortisol production. 
+- Cortisol binds to glucocorticoid receptors that are encoded by the NR3C1 gene. 
+- The NR3C1 gene is associated with early life stress, and methylation of this gene is associated with stress reactivity. Furthermore, excess levels of glucocorticoids can lead to neurological and genetic damage through an imbalance in the production and elimination of reactive oxygen species (ROS), a process known as oxidative stress.
+- F2-isoprostanes are a group of prostaglandin-like compounds that have been validated as a measure of oxidative stress.
+
+## Background
+
+- The term “allostatic load” refers to the cumulative burden of biological stressors that are operationalized by the biomarkers described above in the HPA and SAM axes. 
+- Studies investigating the relationship between allostatic load in children have found chronic stress to contribute to impaired growth. 
+- Allostatic load is related with nutritional outcomes, as higher allostatic load is associated with increased consumption of fat and decreased micronutrient intake. 
+- Furthermore, prolonged HPA-axis activity can lead to the overproduction of insulin and the underproduction of growth and sex hormones, which can alter metabolism and growth. 
+- Chronically high glucocorticoid levels inhibit child growth through a decrease in bone formation, a loss in bone mineral density, and altered growth-plate function. 
+
+
+## Stress Measures
+
+- Urinary F2-isoprostanes (Year 1)
+- Salivary alpha-amylase (Year 2)
+- Salivary cortisol (Year 2)
+- Blood pressure (Year 2)
+- Heart rate (Year 2)
+- NR3C1 methylation status (Year 2)
+
+
+## Outcomes
+
+Exact outcomes depend on timing and type of stress measurement  
+
+- Primary Outcome: Concurrent or subsequent child LAZ or linear growth velocity
+- Secondary Outcome: Concurrent or subsequent child WAZ, HCZ, weight change, or head circumference change
+- Tertiary Outcomes: Concurrent or subsequent child WLZ 
+
+
+## Hypotheses
+
+- H1.	Urinary F2-isoprostane measures are negatively associated with child growth.
+- H2.	Salivary cortisol reactivity is positively associated with concurrent child growth, and sAA reactivity is negatively associated with concurrent child growth. Pre- and post- stressor cortisol concentrations are positively associated with concurrent child growth. Pre- and post-stressor sAA concentrations are negatively associated with concurrent child growth.
+- H3.	SAM biomarker measures are negatively associated with concurrent child growth
+- H4.	Glucocorticoid receptor methylation is negatively associated with concurrent child growth
+
+## Primary findings: H1 
+
+
+Evidence for hypothesis 1 but not the other hypotheses.
+```{r}
+knitr::kable(tbl2)
 ```
 
-## Slide with Plot
+## Primary findings - HAZ
 
-```{r pressure}
-plot(pressure)
+
+```{r}
+
+
+H1_res$Xtime <- "t2"
+H1_res <- H1_res %>% mutate(
+  Ytime = case_when(
+    grepl("_t2_t3",H1_res$Y) ~ "delta",
+    grepl("_t2",H1_res$Y) ~ "t2",
+    grepl("_t3",H1_res$Y) ~ "t3"),
+Ytype = case_when(
+  grepl("laz",H1_res$Y) ~ "LAZ",
+  grepl("waz",H1_res$Y) ~ "WAZ",
+  grepl("whz",H1_res$Y) ~ "WHZ",
+  grepl("hcz",H1_res$Y) ~ "HCZ"))
+H1_res$sig.cat <- ifelse(H1_res$BH.Pval < 0.05, "*", "")
+
+plotdf <- H1_res %>% filter(Ytype=="LAZ") %>% droplevels() %>%
+  mutate(Y=factor(Y, levels=c("laz_t2","laz_t3","delta_laz_t2_t3")))
+p <- ggplot(data = plotdf, (aes(x=X, y=point.diff#, 
+                                #group=sample_cat, color=sample_cat
+                                ))) + 
+  geom_point(size=3, position = position_dodge(0.5), alpha=0.75) +
+  geom_errorbar(aes(ymin=lb.diff, ymax=ub.diff), position = position_dodge(0.5),
+                width = 0.3, size = 1) +
+  facet_wrap(~Y,  scales="free_x") +
+  geom_text(aes(label=sig.cat), color="black", position = position_dodge(0.5), vjust = -0.1) +
+  coord_flip() +
+  # scale_color_manual(breaks = legend_labels,
+  #                    values = colours, drop = FALSE) +
+  geom_hline(yintercept = 0, linetype="dashed") +
+  #labs(color="Sample type") +
+  xlab("Stress biomarker") + ylab("Mean difference: 25th vs. 75th percentile") + 
+  theme_ki() + 
+  theme(axis.ticks.x=element_blank(),
+        legend.position = "bottom",
+        strip.placement = "outside",
+        strip.text.x = element_text(size=10, face = "bold"),
+        strip.text.y = element_text(size=10, angle = 270, face = "bold"),          plot.title = element_text(hjust = 0.5, face = "plain", size=9),
+        panel.spacing = unit(0, "lines")) 
+plot(p)
+
 ```
+
+
+
+## Exposure-response: Concurrent f2 8ip and LAZ
+
+```{r}
+H1_plot_data_sub <- H1_plot_data %>% filter(Xvar=="t2_f2_8ip", Yvar=="laz_t2")
+gam_diff <- H1_res %>% filter(X=="t2_f2_8ip", Y=="laz_t2")
+p <- ggplot(H1_plot_data_sub) + 
+  geom_ribbon(aes(x = X, ymin = lwrS, ymax = uprS), 
+      alpha = 0.5) + 
+  geom_vline(aes(xintercept=q1), data=gam_diff) +
+  geom_vline(aes(xintercept=q3), data=gam_diff) +
+  geom_path(aes(x = X, y = fit), color = "black") + 
+  xlab("f2_8ip") + ylab("LAZ") + 
+  #ggtitle("Concurrent association")+ 
+  ggtitle(paste0(round(gam_diff$point.diff, 2), " (", 
+                 round(gam_diff$lb.diff, 2), ", ", round(gam_diff$ub.diff, 
+                                                         2), ")"))
+p
+
+
+```
+
+## Exposure-response: Concurrent f2 8ip and LAZ
+
+```{r}
+p <- ggplot(H1_plot_data_sub) + 
+  geom_point(aes(x = X, y = Y), alpha=0.2) +
+  geom_ribbon(aes(x = X, ymin = lwrS, ymax = uprS), alpha = 0.5) + 
+  geom_path(aes(x = X, y = fit), color = "black", size=1.5) + 
+  geom_vline(aes(xintercept=q1), data=gam_diff) +
+  geom_vline(aes(xintercept=q3), data=gam_diff) +
+  xlab("") + ylab("") + 
+  ggtitle("")
+p
+```
+
+
+## Exposure-response: Concurrent f2 23d and LAZ
+
+```{r}
+
+H1_plot_data_sub <- H1_plot_data %>% filter(Xvar=="t2_f2_23d", Yvar=="laz_t2")
+gam_diff <- H1_res %>% filter(X=="t2_f2_23d", Y=="laz_t2")
+p <- ggplot(H1_plot_data_sub) + 
+  geom_ribbon(aes(x = X, ymin = lwrS, ymax = uprS), 
+      alpha = 0.5) + 
+  geom_vline(aes(xintercept=q1), data=gam_diff) +
+  geom_vline(aes(xintercept=q3), data=gam_diff) +
+  geom_path(aes(x = X, y = fit), color = "black") + 
+  xlab("f2_23d") + ylab("LAZ") + 
+  #ggtitle("Concurrent association")+ 
+  ggtitle(paste0(round(gam_diff$point.diff, 2), " (", 
+                 round(gam_diff$lb.diff, 2), ", ", round(gam_diff$ub.diff, 
+                                                         2), ")"))
+p
+
+```
+
+
+## Exposure-response: Concurrent f2 VI and LAZ
+
+```{r}
+H1_plot_data_sub <- H1_plot_data %>% filter(Xvar=="t2_f2_VI", Yvar=="laz_t2")
+gam_diff <- H1_res %>% filter(X=="t2_f2_VI", Y=="laz_t2")
+p <- ggplot(H1_plot_data_sub) + 
+  geom_ribbon(aes(x = X, ymin = lwrS, ymax = uprS), 
+      alpha = 0.5) + 
+  geom_vline(aes(xintercept=q1), data=gam_diff) +
+  geom_vline(aes(xintercept=q3), data=gam_diff) +
+  geom_path(aes(x = X, y = fit), color = "black") + 
+  xlab("f2 VI") + ylab("LAZ") + 
+  #ggtitle("Concurrent association")+ 
+  ggtitle(paste0(round(gam_diff$point.diff, 2), " (", 
+                 round(gam_diff$lb.diff, 2), ", ", round(gam_diff$ub.diff, 
+                                                         2), ")"))
+p
+
+```
+
+
+## Exposure-response: Concurrent f2 iso pca and LAZ
+
+```{r}
+H1_plot_data_sub <- H1_plot_data %>% filter(Xvar=="t2_iso_pca", Yvar=="laz_t2")
+gam_diff <- H1_res %>% filter(X=="t2_iso_pca", Y=="laz_t2")
+p <- ggplot(H1_plot_data_sub) + 
+  geom_ribbon(aes(x = X, ymin = lwrS, ymax = uprS), 
+      alpha = 0.5) + 
+  geom_vline(aes(xintercept=q1), data=gam_diff) +
+  geom_vline(aes(xintercept=q3), data=gam_diff) +
+  geom_path(aes(x = X, y = fit), color = "black") + 
+  xlab("f2 iso pca") + ylab("LAZ") + 
+  #ggtitle("Concurrent association")+ 
+  ggtitle(paste0(round(gam_diff$point.diff, 2), " (", 
+                 round(gam_diff$lb.diff, 2), ", ", round(gam_diff$ub.diff, 
+                                                         2), ")"))
+p
+
+```
+
+
+
+## Primary findings - HCZ
+
+
+```{r}
+
+
+plotdf <- H1_res %>% filter(Ytype=="HCZ") %>% droplevels() %>%
+  mutate(Y=factor(Y, levels=c("hcz_t2","hcz_t3","delta_hcz_t2_t3")))
+p <- ggplot(data = plotdf, (aes(x=X, y=point.diff#, 
+                                #group=sample_cat, color=sample_cat
+                                ))) + 
+  geom_point(size=3, position = position_dodge(0.5), alpha=0.75) +
+  geom_errorbar(aes(ymin=lb.diff, ymax=ub.diff), position = position_dodge(0.5),
+                width = 0.3, size = 1) +
+  facet_wrap(~Y,  scales="free_x") +
+  geom_text(aes(label=sig.cat), color="black", position = position_dodge(0.5), vjust = -0.1) +
+  coord_flip() +
+  # scale_color_manual(breaks = legend_labels,
+  #                    values = colours, drop = FALSE) +
+  geom_hline(yintercept = 0, linetype="dashed") +
+  #labs(color="Sample type") +
+  xlab("Stress biomarker") + ylab("Mean difference: 25th vs. 75th percentile") + 
+  theme_ki() + 
+  theme(axis.ticks.x=element_blank(),
+        legend.position = "bottom",
+        strip.placement = "outside",
+        strip.text.x = element_text(size=10, face = "bold"),
+        strip.text.y = element_text(size=10, angle = 270, face = "bold"),          plot.title = element_text(hjust = 0.5, face = "plain", size=9),
+        panel.spacing = unit(0, "lines")) 
+plot(p)
+
+```
+
+## Primary findings - WAZ
+
+
+```{r}
+
+
+
+plotdf <- H1_res %>% filter(Ytype=="WAZ") %>% droplevels() %>%
+  mutate(Y=factor(Y, levels=c("waz_t2","waz_t3","delta_waz_t2_t3")))
+p <- ggplot(data = plotdf, (aes(x=X, y=point.diff#, 
+                                #group=sample_cat, color=sample_cat
+                                ))) + 
+  geom_point(size=3, position = position_dodge(0.5), alpha=0.75) +
+  geom_errorbar(aes(ymin=lb.diff, ymax=ub.diff), position = position_dodge(0.5),
+                width = 0.3, size = 1) +
+  facet_wrap(~Y,  scales="free_x") +
+  geom_text(aes(label=sig.cat), color="black", position = position_dodge(0.5), vjust = -0.1) +
+  coord_flip() +
+  # scale_color_manual(breaks = legend_labels,
+  #                    values = colours, drop = FALSE) +
+  geom_hline(yintercept = 0, linetype="dashed") +
+  #labs(color="Sample type") +
+  xlab("Stress biomarker") + ylab("Mean difference: 25th vs. 75th percentile") + 
+  theme_ki() + 
+  theme(axis.ticks.x=element_blank(),
+        legend.position = "bottom",
+        strip.placement = "outside",
+        strip.text.x = element_text(size=10, face = "bold"),
+        strip.text.y = element_text(size=10, angle = 270, face = "bold"),          plot.title = element_text(hjust = 0.5, face = "plain", size=9),
+        panel.spacing = unit(0, "lines")) 
+plot(p)
+
+```
+
+## Primary findings - WHZ
+
+
+```{r}
+
+
+plotdf <- H1_res %>% filter(Ytype=="WHZ") %>% droplevels() %>%
+  mutate(Y=factor(Y, levels=c("whz_t2","whz_t3","delta_whz_t2_t3")))
+p <- ggplot(data = plotdf, (aes(x=X, y=point.diff#, 
+                                #group=sample_cat, color=sample_cat
+                                ))) + 
+  geom_point(size=3, position = position_dodge(0.5), alpha=0.75) +
+  geom_errorbar(aes(ymin=lb.diff, ymax=ub.diff), position = position_dodge(0.5),
+                width = 0.3, size = 1) +
+  facet_wrap(~Y,  scales="free_x") +
+  geom_text(aes(label=sig.cat), color="black", position = position_dodge(0.5), vjust = -0.1) +
+  coord_flip() +
+  # scale_color_manual(breaks = legend_labels,
+  #                    values = colours, drop = FALSE) +
+  geom_hline(yintercept = 0, linetype="dashed") +
+  #labs(color="Sample type") +
+  xlab("Stress biomarker") + ylab("Mean difference: 25th vs. 75th percentile") + 
+  theme_ki() + 
+  theme(axis.ticks.x=element_blank(),
+        legend.position = "bottom",
+        strip.placement = "outside",
+        strip.text.x = element_text(size=10, face = "bold"),
+        strip.text.y = element_text(size=10, angle = 270, face = "bold"),          plot.title = element_text(hjust = 0.5, face = "plain", size=9),
+        panel.spacing = unit(0, "lines")) 
+plot(p)
+
+```
+
+
+## Primary findings: H2
+
+No associations significant after P-value correction with other growth outcomes
+
+```{r}
+
+
+H2_res$Xtime <- "t2"
+H2_res <- H2_res %>% mutate(
+  Ytime = case_when(
+    grepl("_t2_t3",H2_res$Y) ~ "delta",
+    grepl("_t2",H2_res$Y) ~ "t2",
+    grepl("_t3",H2_res$Y) ~ "t3"),
+Ytype = case_when(
+  grepl("laz",H2_res$Y) ~ "LAZ",
+  grepl("waz",H2_res$Y) ~ "WAZ",
+  grepl("whz",H2_res$Y) ~ "WHZ",
+  grepl("hcz",H2_res$Y) ~ "HCZ"))
+H2_res$sig.cat <- ifelse(H2_res$BH.Pval < 0.05, "*", "")
+
+plotdf <- H2_res %>% filter(Ytype=="LAZ") %>% droplevels() %>%
+  mutate(Y=factor(Y, levels=c("laz_t2","laz_t3","delta_laz_t2_t3")))
+p <- ggplot(data = plotdf, (aes(x=X, y=point.diff#, 
+                                #group=sample_cat, color=sample_cat
+                                ))) + 
+  geom_point(size=3, position = position_dodge(0.5), alpha=0.75) +
+  geom_errorbar(aes(ymin=lb.diff, ymax=ub.diff), position = position_dodge(0.5),
+                width = 0.3, size = 1) +
+  facet_wrap(~Y,  scales="free_x") +
+  geom_text(aes(label=sig.cat), color="black", position = position_dodge(0.5), vjust = -0.1) +
+  coord_flip() +
+  # scale_color_manual(breaks = legend_labels,
+  #                    values = colours, drop = FALSE) +
+  geom_hline(yintercept = 0, linetype="dashed") +
+  #labs(color="Sample type") +
+  xlab("Stress biomarker") + ylab("Mean difference: 25th vs. 75th percentile") + 
+  theme_ki() + 
+  theme(axis.ticks.x=element_blank(),
+        legend.position = "bottom",
+        strip.placement = "outside",
+        strip.text.x = element_text(size=10, face = "bold"),
+        strip.text.y = element_text(size=10, angle = 270, face = "bold"),          plot.title = element_text(hjust = 0.5, face = "plain", size=9),
+        panel.spacing = unit(0, "lines")) 
+plot(p)
+
+```
+
+
+## Primary findings: H3
+
+No associations significant after P-value correction with other growth outcomes
+
+```{r}
+
+
+H3_res$Xtime <- "t2"
+H3_res <- H3_res %>% mutate(
+  Ytime = case_when(
+    grepl("_t2_t3",H3_res$Y) ~ "delta",
+    grepl("_t2",H3_res$Y) ~ "t2",
+    grepl("_t3",H3_res$Y) ~ "t3"),
+Ytype = case_when(
+  grepl("laz",H3_res$Y) ~ "LAZ",
+  grepl("waz",H3_res$Y) ~ "WAZ",
+  grepl("whz",H3_res$Y) ~ "WHZ",
+  grepl("hcz",H3_res$Y) ~ "HCZ"))
+H3_res$sig.cat <- ifelse(H3_res$BH.Pval < 0.05, "*", "")
+
+plotdf <- H3_res %>% filter(Ytype=="LAZ") %>% droplevels() %>%
+  mutate(Y=factor(Y, levels=c("laz_t2","laz_t3","delta_laz_t2_t3")))
+p <- ggplot(data = plotdf, (aes(x=X, y=point.diff#, 
+                                #group=sample_cat, color=sample_cat
+                                ))) + 
+  geom_point(size=3, position = position_dodge(0.5), alpha=0.75) +
+  geom_errorbar(aes(ymin=lb.diff, ymax=ub.diff), position = position_dodge(0.5),
+                width = 0.3, size = 1) +
+  facet_wrap(~Y,  scales="free_x") +
+  geom_text(aes(label=sig.cat), color="black", position = position_dodge(0.5), vjust = -0.1) +
+  coord_flip() +
+  # scale_color_manual(breaks = legend_labels,
+  #                    values = colours, drop = FALSE) +
+  geom_hline(yintercept = 0, linetype="dashed") +
+  #labs(color="Sample type") +
+  xlab("Stress biomarker") + ylab("Mean difference: 25th vs. 75th percentile") + 
+  theme_ki() + 
+  theme(axis.ticks.x=element_blank(),
+        legend.position = "bottom",
+        strip.placement = "outside",
+        strip.text.x = element_text(size=10, face = "bold"),
+        strip.text.y = element_text(size=10, angle = 270, face = "bold"),          plot.title = element_text(hjust = 0.5, face = "plain", size=9),
+        panel.spacing = unit(0, "lines")) 
+plot(p)
+
+```
+
+
+## Primary findings: H4
+
+No associations significant after P-value correction with other growth outcomes
+
+```{r}
+
+
+H4_res$Xtime <- "t2"
+H4_res <- H4_res %>% mutate(
+  Ytime = case_when(
+    grepl("_t2_t3",H4_res$Y) ~ "delta",
+    grepl("_t2",H4_res$Y) ~ "t2",
+    grepl("_t3",H4_res$Y) ~ "t3"),
+Ytype = case_when(
+  grepl("laz",H4_res$Y) ~ "LAZ",
+  grepl("waz",H4_res$Y) ~ "WAZ",
+  grepl("whz",H4_res$Y) ~ "WHZ",
+  grepl("hcz",H4_res$Y) ~ "HCZ"))
+H4_res$sig.cat <- ifelse(H4_res$BH.Pval < 0.05, "*", "")
+
+plotdf <- H4_res %>% filter(Ytype=="LAZ") %>% droplevels() %>%
+  mutate(Y=factor(Y, levels=c("laz_t2","laz_t3","delta_laz_t2_t3")))
+p <- ggplot(data = plotdf, (aes(x=X, y=point.diff#, 
+                                #group=sample_cat, color=sample_cat
+                                ))) + 
+  geom_point(size=3, position = position_dodge(0.5), alpha=0.75) +
+  geom_errorbar(aes(ymin=lb.diff, ymax=ub.diff), position = position_dodge(0.5),
+                width = 0.3, size = 1) +
+  facet_wrap(~Y,  scales="free_x") +
+  geom_text(aes(label=sig.cat), color="black", position = position_dodge(0.5), vjust = -0.1) +
+  coord_flip() +
+  # scale_color_manual(breaks = legend_labels,
+  #                    values = colours, drop = FALSE) +
+  geom_hline(yintercept = 0, linetype="dashed") +
+  #labs(color="Sample type") +
+  xlab("Stress biomarker") + ylab("Mean difference: 25th vs. 75th percentile") + 
+  theme_ki() + 
+  theme(axis.ticks.x=element_blank(),
+        legend.position = "bottom",
+        strip.placement = "outside",
+        strip.text.x = element_text(size=10, face = "bold"),
+        strip.text.y = element_text(size=10, angle = 270, face = "bold"),          plot.title = element_text(hjust = 0.5, face = "plain", size=9),
+        panel.spacing = unit(0, "lines")) 
+plot(p)
+
+```
+
+## Conclusions
+
+- Consistent evidence of hypothesis that urinary F2-isoprostane measures are negatively associated with child growth.
+- F2-isoprostanes are a group of prostaglandin-like compounds that have been validated as a measure of oxidative stress, indicating oxidative stress is associated with decreased child growth. 
+- Evidence that children with higher concentrations of urinary F2-isoprostane measures have faster growth velocity, evidence of catch-up growth or possible regression to the mean.
+- Possible alternative explanation? Children with low growth have higher F2-isoprostane measures (reverse causality), so we wouldn't expect an association between 14 month F2-isoprostane concentrations and 28 month growth. Mild catch-up growth explains the positive association with growth trajectories. 
+- Alternatively, some acute insult like diarrheal disease or failure to appropriately breastfeed leads to both reduced growth and increased oxidative stress. Chronic undernutrition or small stature, which would lead to maintained small stature at 28 months, has less of an impact on oxidative stress so there isn't an association 28 months growth.
+-Additional evidence for this: LAZ at 3 months not associated with F2-isoprostane measures
+- No strong evidence for other three hypotheses.
+
+
+## Exploratory visualizations - Change in LAZ by quartile of F2-23d
+
+
+
+```{r, warning=FALSE, message=FALSE}
+
+plot(p_rtm)
+
+```
+
 
