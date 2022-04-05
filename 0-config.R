@@ -20,7 +20,11 @@ library(here)
 library(cowplot)
 library(mgcv)
 library(psych)
+library(boxr)
 library(RColorBrewer)
+
+box_auth()
+
 
 if(!require(washbgam)){
   devtools::install_github("washb-eed-substudies/washbgam")
