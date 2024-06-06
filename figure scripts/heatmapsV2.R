@@ -147,7 +147,7 @@ plot_sig_heatmap <- function (d, pval_var = "Pval", title = "", Outcome = "Growt
           strip.background = element_blank(), panel.background = element_rect(fill = "grey80", 
                                                                               colour = "grey80"), panel.grid.major = element_blank(), 
           panel.grid.minor = element_blank()) + 
-      guides(fill = guide_legend("P-value strength", nrow = 2)) +
+      guides(fill = guide_legend("P-value strength", nrow = 2, title.position = "top")) +
       labs(x = Outcome, y = Exposure, title = title)
   hm
   return(hm)

@@ -57,23 +57,14 @@ p_main_t2
 
 The heatmap shows the adjusted associations between each urinary isoprostane measure of oxidative stress and child growth outcomes at and between year 1 and year 2. Printed in each cell is the GAM-estimated adjusted mean difference in child growth outcome at the 75th and 25th percentile of each exposure distribution, with the cells colored by the magnitude and direction of the estimated P-values. Estimates are annotated with an asterisk (*) if still significant after FDR correction for multiple comparisons. LAZ: Length-for-age Z-score; WAZ: Weight-for-age Z-score; HCAZ: Head circumference-for-age Z-score; WLZ: Weight-for-length Z-score.
 
-```{r, echo=F, warning=FALSE, fig.width=8, fig.height=6}
+
+```{r, echo=F, warning=FALSE, fig.width=9.5, fig.height=6}
 
 p_main_t3
 
 ```
 
-```{r, echo=F, warning=FALSE, fig.width=9, fig.height=6}
 
-p_main_t3
-
-```
-
-```{r, echo=F, warning=FALSE, fig.width=8, fig.height=5}
-
-p_main_t3
-
-```
 
 **Figure 4: Heatmap of associations between hypothalamic-pituitary-adrenal axis and sympathetic adrenomedullary axis stress measures and child growth outcomes at year 2**
 
