@@ -37,13 +37,13 @@ full_adj_res <- full_adj_res %>% group_by(H) %>%
   ungroup() %>%
   as.data.frame()
 
-saveRDS(full_res %>% filter(H==1) %>% select(-H), here("results/unadjusted/H1_res.RDS"))
-saveRDS(full_res %>% filter(H==2) %>% select(-H), here("results/unadjusted/H2_res.RDS"))
-saveRDS(full_res %>% filter(H==3) %>% select(-H), here("results/unadjusted/H3_res.RDS"))
-saveRDS(full_res %>% filter(H==4) %>% select(-H), here("results/unadjusted/H4_res.RDS"))
+saveRDS(full_res %>% filter(H==1) %>% select(-H), here("results/unadjusted/H1_res_clean.RDS"))
+saveRDS(full_res %>% filter(H==2) %>% select(-H), here("results/unadjusted/H2_res_clean.RDS"))
+saveRDS(full_res %>% filter(H==3) %>% select(-H), here("results/unadjusted/H3_res_clean.RDS"))
+saveRDS(full_res %>% filter(H==4) %>% select(-H), here("results/unadjusted/H4_res_clean.RDS"))
 
-saveRDS(full_adj_res %>% filter(H==1) %>% select(-H), here("results/adjusted/H1_adj_res.RDS"))
-saveRDS(full_adj_res %>% filter(H==2) %>% select(-H), here("results/adjusted/H2_adj_res.RDS"))
-saveRDS(full_adj_res %>% filter(H==3) %>% select(-H), here("results/adjusted/H3_adj_res.RDS"))
-saveRDS(full_adj_res %>% filter(H==4) %>% select(-H), here("results/adjusted/H4_adj_res.RDS"))
+saveRDS(full_adj_res %>% filter(H==1) %>% select(-H), here("results/adjusted/H1_adj_res_clean.RDS"))
+saveRDS(full_adj_res %>% filter(H==2) %>% select(-H), here("results/adjusted/H2_adj_res_clean.RDS"))
+saveRDS(full_adj_res %>% filter(H==3) %>% select(-H), here("results/adjusted/H3_adj_res_clean.RDS"))
+saveRDS(full_adj_res %>% filter(H==4) %>% select(-H), here("results/adjusted/H4_adj_res_clean.RDS"))
 

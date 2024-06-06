@@ -6,7 +6,7 @@ rm(list=ls())
 
 source(here::here("0-config.R"))
 
-d <- box_read("880476682582")
+d <- readRDS(paste0(dropboxDir,"Data/Cleaned/Andrew/stress_growth_data_clean.RDS"))
 
 #glm function
 fit_RE_glm <- function (d, Y, X, W = NULL, forcedW = NULL, V = NULL, id = "clusterid", family = "gaussian", pval = 0.2, print = TRUE){
@@ -78,8 +78,7 @@ fit_RE_glm <- function (d, Y, X, W = NULL, forcedW = NULL, V = NULL, id = "clust
     for (i in 1:ncol(W)) {
       tmp <- glm(constant ~ ., data = Wdf, family = family)
       todrop <- NULL
-      todrop <- suppressWarnings(names(tmp$coefficients)[-1][as.vector(vif(tmp)) > 
-                                                               10][1])
+      todrop <- try(suppressWarnings(names(tmp$coefficients)[-1][as.vector(vif(tmp)) > 10][1]))
       if (!is.null(todrop) & !is.na(todrop)) {
         collinear_vars <- c(collinear_vars, todrop)
         Wdf <- Wdf[, colnames(Wdf) != todrop]
@@ -266,7 +265,8 @@ Wvars[!(Wvars %in% colnames(d))]
 
 # time varying covariates:
 Wvars2_anthro<-c("ageday_at2", "month_at2")
-Wvars3_anthro<-c("ageday_at3", "month_at3", "diar7d_t3", "cesd_sum_ee_t3", "pss_sum_mom_t3", "life_viol_any_t3")  
+Wvars3_anthro<-c("ageday_at3", "month_at3", "diar7d_t3", "cesd_sum_ee_t3", "pss_sum_mom_t3", "life_viol_any_t3")
+
 
 Wvars2_F2<-c("ageday_ut2", "month_ut2") 
 Wvars3_vital<-c("ageday_t3_vital", "month_vt3", "cesd_sum_ee_t3", "pss_sum_mom_t3", "diar7d_t3", "life_viol_any_t3") 

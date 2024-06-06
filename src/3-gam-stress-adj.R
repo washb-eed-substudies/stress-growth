@@ -6,7 +6,11 @@ rm(list=ls())
 
 source(here::here("0-config.R"))
 
-d <- box_read("880476682582")
+d <- readRDS(paste0(dropboxDir,"Data/Cleaned/Andrew/stress_growth_data_clean.RDS"))
+
+#Double check the outcome transformation:
+summary(d$t3_saa_z01_raw)
+summary(d$laz_t1_cat)
 
 
 #Set list of adjustment variables
@@ -18,10 +22,10 @@ Wvars<-c("sex","birthord", "momage","momheight","momedu",
 Wvars[!(Wvars %in% colnames(d))]
 
 
-
 # time varying covariates:
 Wvars2_anthro<-c("ageday_at2", "month_at2")
-Wvars3_anthro<-c("ageday_at3", "month_at3", "diar7d_t3", "cesd_sum_ee_t3", "pss_sum_mom_t3", "life_viol_any_t3")  
+Wvars3_anthro<-c("ageday_at3", "month_at3", "diar7d_t3", "cesd_sum_ee_t3", "pss_sum_mom_t3", "life_viol_any_t3")
+
 
 Wvars2_F2<-c("ageday_ut2", "month_ut2") 
 Wvars3_vital<-c("ageday_t3_vital", "month_vt3", "cesd_sum_ee_t3", "pss_sum_mom_t3", "diar7d_t3", "life_viol_any_t3") 
@@ -32,14 +36,16 @@ Wvars3_oragene<-c("ageday_t3_oragene", "month_ot3", "cesd_sum_ee_t3", "pss_sum_m
 # add time-varying covariates
 # add hcz and time of day measurement later in pick covariates function 
 W2_F2.W2_anthro <- c(Wvars, Wvars2_F2 ,Wvars2_anthro, "laz_t1_cat", "waz_t1_cat") %>% unique(.)
-W2_F2.W3_anthro <- c(Wvars, Wvars2_F2 ,Wvars3_anthro, 
-                     "laz_t2", "waz_t2") %>% unique(.)
+W2_F2.W3_anthro <- c(Wvars, Wvars2_F2 ,Wvars3_anthro, "laz_t2", "waz_t2") %>% unique(.)
 #W2_F2.W23_anthro <- c(Wvars, Wvars2_F2, Wvars2_anthro, Wvars3_anthro, "laz_t2_cat", "waz_t2_cat") %>% unique(.)
 W2_F2.W23_anthro <- c(Wvars, Wvars2_F2, Wvars2_anthro, Wvars3_anthro) %>% unique(.)
 W3_vital.W3_anthro <- c(Wvars, Wvars3_vital, Wvars3_anthro, "laz_t2_cat", "waz_t2_cat") %>% unique(.)
 W3_salimetrics.W3_anthro <- c(Wvars, Wvars3_salimetrics, Wvars3_anthro, "laz_t2_cat", "waz_t2_cat") %>% unique(.)
 W3_oragene.W3_anthro <- c(Wvars, Wvars3_oragene, Wvars3_anthro, "laz_t2_cat", "waz_t2_cat") %>% unique(.)
 
+
+#check covariate missingness
+dW <- d %>% select(Wvars)
 
 pick_covariates <- function(i, j){
   # i is exposure as string
@@ -142,7 +148,7 @@ for(i in 1:nrow(H1_adj_models)){
 
 
 #Save models
-#saveRDS(H1_adj_models, paste0(dropboxDir,"results/stress-growth-models/models/H1_adj_models.RDS"))
+#saveRDS(H1_adj_models, paste0(dropboxDir,"Results/stress-growth-models/models/H1_adj_models.RDS"))
 
 #Save results
 saveRDS(H1_adj_res, here("results/adjusted/H1_adj_res.RDS"))
@@ -152,8 +158,7 @@ saveRDS(H1_adj_res, here("results/adjusted/H1_adj_res.RDS"))
 #saveRDS(H1_adj_plot_list, paste0(dropboxDir,"results/stress-growth-models/figure-objects/H1_adj_splines.RDS"))
 
 #Save plot data
-saveRDS(H1_adj_plot_data, paste0(dropboxDir,"results/stress-growth-models/figure-data/H1_adj_spline_data.RDS"))
-
+saveRDS(H1_adj_plot_data, here("figure-data/H1_adj_spline_data.RDS"))
 
 ## Hypothesis 2a
 #Change in slope between pre- and post-stressor cortisol measured at Year 2 is positively associated 
@@ -238,7 +243,7 @@ saveRDS(H2_adj_res, here("results/adjusted/H2_adj_res.RDS"))
 #saveRDS(H2_adj_plot_list, paste0(dropboxDir,"results/stress-growth-models/figure-objects/H2_adj_adj_splines.RDS"))
 
 #Save plot data
-saveRDS(H2_adj_plot_data, paste0(dropboxDir,"results/stress-growth-models/figure-data/H2_adj_adj_spline_data.RDS"))
+saveRDS(H2_adj_plot_data, here("figure-data/H2_adj_spline_data.RDS"))
 
 
 
@@ -290,7 +295,7 @@ H3_plot_list <- NULL
 H3_plot_data <- NULL
 for(i in 1:nrow(H3_models)){
   res <- data.frame(X=H3_models$X[i], Y=H3_models$Y[i])
-  simul_plot <- gam_simul_CI(H3_models$fit[i][[1]], H3_models$dat[i][[1]], xlab=res$X, ylab=res$Y, title="", gam_diff=H3_adj_res[i,])
+  simul_plot <- gam_simul_CI(H3_models$fit[i][[1]], H3_models$dat[i][[1]], xlab=res$X, ylab=res$Y, title="", gam_diff=H3_res[i,])
   #H3_plot_list[[i]] <-  simul_plot$p
   H3_plot_data <-  rbind(H3_plot_data, data.frame(Xvar=res$X, Yvar=res$Y, adj=0, simul_plot$pred%>% subset(., select = c(Y,X,id,fit,se.fit,uprP, lwrP,uprS,lwrS))))
 }
@@ -307,7 +312,8 @@ saveRDS(H3_res, here("results/adjusted/H3_adj_res.RDS"))
 #saveRDS(H3_plot_list, paste0(dropboxDir,"results/stress-growth-models/figure-objects/H3_adj_splines.RDS"))
 
 #Save plot data
-saveRDS(H3_plot_data, paste0(dropboxDir,"results/stress-growth-models/figure-data/H3_adj_spline_data.RDS"))
+saveRDS(H3_plot_data, here("figure-data/H3_adj_spline_data.RDS"))
+
 
 
 ##Hypothesis 4a
@@ -357,7 +363,7 @@ H4_plot_list <- NULL
 H4_plot_data <- NULL
 for(i in 1:nrow(H4_models)){
   res <- data.frame(X=H4_models$X[i], Y=H4_models$Y[i])
-  simul_plot <- gam_simul_CI(H4_models$fit[i][[1]], H4_models$dat[i][[1]], xlab=res$X, ylab=res$Y, title="", gam_diff=H4_adj_res[i,])
+  simul_plot <- gam_simul_CI(H4_models$fit[i][[1]], H4_models$dat[i][[1]], xlab=res$X, ylab=res$Y, title="", gam_diff=H4_res[i,])
   #H4_plot_list[[i]] <-  simul_plot$p
   H4_plot_data <-  rbind(H4_plot_data, data.frame(Xvar=res$X, Yvar=res$Y, adj=0, simul_plot$pred%>% subset(., select = c(Y,X,id,fit,se.fit,uprP, lwrP,uprS,lwrS))))
 }
@@ -374,5 +380,5 @@ saveRDS(H4_res, here("results/adjusted/H4_adj_res.RDS"))
 #saveRDS(H4_plot_list, paste0(dropboxDir,"results/stress-growth-models/figure-objects/H4_adj_splines.RDS"))
 
 #Save plot data
-saveRDS(H4_plot_data, paste0(dropboxDir,"results/stress-growth-models/figure-data/H4_adj_spline_data.RDS"))
+saveRDS(H4_plot_data, here("figure-data/H4_adj_spline_data.RDS"))
 

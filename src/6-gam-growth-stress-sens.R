@@ -6,7 +6,7 @@ rm(list=ls())
 
 source(here::here("0-config.R"))
 
-d <- box_read("880476682582")
+d <- readRDS(paste0(dropboxDir,"Data/Cleaned/Andrew/stress_growth_data_clean.RDS"))
 
 
 #Set list of adjustment variables
@@ -21,7 +21,8 @@ Wvars[!(Wvars %in% colnames(d))]
 
 # time varying covariates:
 Wvars2_anthro<-c("ageday_at2", "month_at2")
-Wvars3_anthro<-c("ageday_at3", "month_at3", "diar7d_t3", "cesd_sum_ee_t3", "pss_sum_mom_t3", "life_viol_any_t3")  
+Wvars3_anthro<-c("ageday_at3", "month_at3", "diar7d_t3", "cesd_sum_ee_t3", "pss_sum_mom_t3", "life_viol_any_t3")
+
 
 Wvars2_F2<-c("ageday_ut2", "month_ut2") 
 Wvars3_vital<-c("ageday_t3_vital", "month_vt3", "cesd_sum_ee_t3", "pss_sum_mom_t3", "diar7d_t3", "life_viol_any_t3") 
@@ -53,10 +54,10 @@ pick_covariates <- function(i, j){
   else if(i %in% c("t3_map", "t3_hr_mean")){Wset = W3_vital.W3_anthro}
   else{Wset = W3_oragene.W3_anthro}
   
-  if(j=="hcz_t3"){
-    if(grepl("t2_",i)){Wset=c(Wset, "hcz_t2")}
-    else{Wset=c(Wset, "hcz_t2_cat")}}
-  if(j=="hcz_t2"){Wset=c(Wset, "hcz_t1_cat")}
+  # if(j=="hcz_t3"){
+  #   if(grepl("t2_",i)){Wset=c(Wset, "hcz_t2")}
+  #   else{Wset=c(Wset, "hcz_t2_cat")}}
+  # if(j=="hcz_t2"){Wset=c(Wset, "hcz_t1_cat")}
   return(Wset)
 }
 
@@ -128,15 +129,15 @@ for(i in 1:nrow(H1_adj_models)){
   H1_adj_res_noWgrowth <-  bind_rows(H1_adj_res_noWgrowth , preds$res)
 }
 
-#Make list of plots
-H1_adj_plot_list <- NULL
-H1_adj_plot_data <- NULL
-for(i in 1:nrow(H1_adj_models)){
-  res <- data.frame(X=H1_adj_models$X[i], Y=H1_adj_models$Y[i])
-  simul_plot <- gam_simul_CI(H1_adj_models$fit[i][[1]], H1_adj_models$dat[i][[1]], xlab=res$X, ylab=res$Y, title="", gam_diff=H1_adj_res_noWgrowth[i,])
-  H1_adj_plot_data <-  rbind(H1_adj_plot_data, data.frame(Xvar=res$X, Yvar=res$Y, adj=0, simul_plot$pred %>% subset(., select = c(Y,X,id,fit,se.fit,uprP, lwrP,uprS,lwrS))))
-}
-
+# #Make list of plots
+# H1_adj_plot_list <- NULL
+# H1_adj_plot_data <- NULL
+# for(i in 1:nrow(H1_adj_models)){
+#   res <- data.frame(X=H1_adj_models$X[i], Y=H1_adj_models$Y[i])
+#   simul_plot <- gam_simul_CI(H1_adj_models$fit[i][[1]], H1_adj_models$dat[i][[1]], xlab=res$X, ylab=res$Y, title="", gam_diff=H1_adj_res_noWgrowth[i,])
+#   H1_adj_plot_data <-  rbind(H1_adj_plot_data, data.frame(Xvar=res$X, Yvar=res$Y, adj=0, simul_plot$pred %>% subset(., select = c(Y,X,id,fit,se.fit,uprP, lwrP,uprS,lwrS))))
+# }
+# 
 
 
 #Save results
@@ -191,7 +192,7 @@ for(i in Xvars){
     print(i)
     print(j)
     Wset<-pick_covariates(i, j)
-    res_adj <- fit_RE_gam(d=d, X=i, Y=j,  W=Wset)
+    res_adj <- fit_RE_gam(d=d, X=i, Y=j,  W=Wset[!(Wset %in% c("month_at3","waz_t2_cat"))])
     res <- data.frame(X=i, Y=j, fit=I(list(res_adj$fit)), dat=I(list(res_adj$dat)))
     H2_adj_models <- bind_rows(H2_adj_models, res)
   }

@@ -6,12 +6,12 @@ rm(list=ls())
 
 source(here::here("0-config.R"))
 
-d<-readRDS(paste0(dropboxDir, "Data/Cleaned/Andrew/stress_growth_data.RDS"))
+d <- readRDS(paste0(dropboxDir,"Data/Cleaned/Andrew/stress_growth_data_clean.RDS"))
 
 #Set list of adjustment variables
 #Make vectors of adjustment variable names
 Wvars<-c("sex","birthord", "momage","momheight","momedu", 
-         "hfiacat", "Nlt18","Ncomp", "watmin", "walls", "floor", "HHwealth",
+         "hfiacat", "Nlt18","Ncomp", "watmin", "walls", "floor", "HHwealth_scaled",
          "cesd_sum_t2", "diar7d_t2", "tr", "life_viol_any_t3")
 
 Wvars[!(Wvars %in% colnames(d))]
@@ -127,15 +127,15 @@ for(i in 1:nrow(H1_adj_models)){
   H1_adj_res <-  bind_rows(H1_adj_res , preds$res)
 }
 
-#Make list of plots
-H1_adj_plot_list <- NULL
-H1_adj_plot_data <- NULL
-for(i in 1:nrow(H1_adj_models)){
-  res <- data.frame(X=H1_adj_models$X[i], Y=H1_adj_models$Y[i])
-  simul_plot <- gam_simul_CI(H1_adj_models$fit[i][[1]], H1_adj_models$dat[i][[1]], xlab=res$X, ylab=res$Y, title="")
-  H1_adj_plot_list[[i]] <-  simul_plot$p
-  H1_adj_plot_data <-  rbind(H1_adj_plot_data, data.frame(Xvar=res$X, Yvar=res$Y, adj=0, simul_plot$pred %>% subset(., select = c(Y,X,id,fit,se.fit,uprP, lwrP,uprS,lwrS))))
-}
+# #Make list of plots
+# H1_adj_plot_list <- NULL
+# H1_adj_plot_data <- NULL
+# for(i in 1:nrow(H1_adj_models)){
+#   res <- data.frame(X=H1_adj_models$X[i], Y=H1_adj_models$Y[i])
+#   simul_plot <- gam_simul_CI(H1_adj_models$fit[i][[1]], H1_adj_models$dat[i][[1]], xlab=res$X, ylab=res$Y, title="")
+#   H1_adj_plot_list[[i]] <-  simul_plot$p
+#   H1_adj_plot_data <-  rbind(H1_adj_plot_data, data.frame(Xvar=res$X, Yvar=res$Y, adj=0, simul_plot$pred %>% subset(., select = c(Y,X,id,fit,se.fit,uprP, lwrP,uprS,lwrS))))
+# }
 
 
 ## Hypothesis 2a
@@ -199,15 +199,15 @@ for(i in 1:nrow(H2_adj_models)){
   H2_adj_res <-  bind_rows(H2_adj_res , preds$res)
 }
 
-#Make list of plots
-H2_adj_plot_list <- NULL
-H2_adj_plot_data <- NULL
-for(i in 1:nrow(H2_adj_models)){
-  res <- data.frame(X=H2_adj_models$X[i], Y=H2_adj_models$Y[i])
-  simul_plot <- gam_simul_CI(H2_adj_models$fit[i][[1]], H2_adj_models$dat[i][[1]], xlab=res$X, ylab=res$Y, title="")
-  H2_adj_plot_list[[i]] <-  simul_plot$p
-  H2_adj_plot_data <-  rbind(H2_adj_plot_data, data.frame(Xvar=res$X, Yvar=res$Y, adj=0, simul_plot$pred%>% subset(., select = c(Y,X,id,fit,se.fit,uprP, lwrP,uprS,lwrS))))
-}
+# #Make list of plots
+# H2_adj_plot_list <- NULL
+# H2_adj_plot_data <- NULL
+# for(i in 1:nrow(H2_adj_models)){
+#   res <- data.frame(X=H2_adj_models$X[i], Y=H2_adj_models$Y[i])
+#   simul_plot <- gam_simul_CI(H2_adj_models$fit[i][[1]], H2_adj_models$dat[i][[1]], xlab=res$X, ylab=res$Y, title="")
+#   H2_adj_plot_list[[i]] <-  simul_plot$p
+#   H2_adj_plot_data <-  rbind(H2_adj_plot_data, data.frame(Xvar=res$X, Yvar=res$Y, adj=0, simul_plot$pred%>% subset(., select = c(Y,X,id,fit,se.fit,uprP, lwrP,uprS,lwrS))))
+# }
 
 
 
@@ -254,15 +254,15 @@ for(i in 1:nrow(H3_models)){
   H3_res <-  bind_rows(H3_res , preds$res)
 }
 
-#Make list of plots
-H3_plot_list <- NULL
-H3_plot_data <- NULL
-for(i in 1:nrow(H3_models)){
-  res <- data.frame(X=H3_models$X[i], Y=H3_models$Y[i])
-  simul_plot <- gam_simul_CI(H3_models$fit[i][[1]], H3_models$dat[i][[1]], xlab=res$X, ylab=res$Y, title="")
-  H3_plot_list[[i]] <-  simul_plot$p
-  H3_plot_data <-  rbind(H3_plot_data, data.frame(Xvar=res$X, Yvar=res$Y, adj=0, simul_plot$pred%>% subset(., select = c(Y,X,id,fit,se.fit,uprP, lwrP,uprS,lwrS))))
-}
+# #Make list of plots
+# H3_plot_list <- NULL
+# H3_plot_data <- NULL
+# for(i in 1:nrow(H3_models)){
+#   res <- data.frame(X=H3_models$X[i], Y=H3_models$Y[i])
+#   simul_plot <- gam_simul_CI(H3_models$fit[i][[1]], H3_models$dat[i][[1]], xlab=res$X, ylab=res$Y, title="")
+#   H3_plot_list[[i]] <-  simul_plot$p
+#   H3_plot_data <-  rbind(H3_plot_data, data.frame(Xvar=res$X, Yvar=res$Y, adj=0, simul_plot$pred%>% subset(., select = c(Y,X,id,fit,se.fit,uprP, lwrP,uprS,lwrS))))
+# }
 
 
 
@@ -310,15 +310,15 @@ for(i in 1:nrow(H4_models)){
   H4_res <-  bind_rows(H4_res , preds$res)
 }
 
-#Make list of plots
-H4_plot_list <- NULL
-H4_plot_data <- NULL
-for(i in 1:nrow(H4_models)){
-  res <- data.frame(X=H4_models$X[i], Y=H4_models$Y[i])
-  simul_plot <- gam_simul_CI(H4_models$fit[i][[1]], H4_models$dat[i][[1]], xlab=res$X, ylab=res$Y, title="")
-  H4_plot_list[[i]] <-  simul_plot$p
-  H4_plot_data <-  rbind(H4_plot_data, data.frame(Xvar=res$X, Yvar=res$Y, adj=0, simul_plot$pred%>% subset(., select = c(Y,X,id,fit,se.fit,uprP, lwrP,uprS,lwrS))))
-}
+# #Make list of plots
+# H4_plot_list <- NULL
+# H4_plot_data <- NULL
+# for(i in 1:nrow(H4_models)){
+#   res <- data.frame(X=H4_models$X[i], Y=H4_models$Y[i])
+#   simul_plot <- gam_simul_CI(H4_models$fit[i][[1]], H4_models$dat[i][[1]], xlab=res$X, ylab=res$Y, title="")
+#   H4_plot_list[[i]] <-  simul_plot$p
+#   H4_plot_data <-  rbind(H4_plot_data, data.frame(Xvar=res$X, Yvar=res$Y, adj=0, simul_plot$pred%>% subset(., select = c(Y,X,id,fit,se.fit,uprP, lwrP,uprS,lwrS))))
+# }
 
 
 

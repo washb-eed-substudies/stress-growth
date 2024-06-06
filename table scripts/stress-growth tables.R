@@ -1,23 +1,45 @@
 rm(list=ls())
 
 source(here::here("0-config.R"))
-source(here::here("table-functions.R"))
+source(here::here("table scripts/table-functions.R"))
 
 # load enrollment characteristics and results
-d <- read.csv(paste0(dropboxDir, "Data/Cleaned/Audrie/bangladesh-dm-ee-stress-growth-covariates-stresslab-anthro.csv"))
-H1 <- readRDS(here('results/unadjusted/H1_res.RDS'))
-H2 <- readRDS(here('results/unadjusted/H2_res.RDS'))
-H3 <- readRDS(here('results/unadjusted/H3_res.RDS'))
-H4 <- readRDS(here('results/unadjusted/H4_res.RDS'))
-H1adj <- readRDS(here('results/adjusted/H1_adj_res.RDS'))
-H2adj <- readRDS(here('results/adjusted/H2_adj_res.RDS'))
-H3adj <- readRDS(here('results/adjusted/H3_adj_res.RDS'))
-H4adj <- readRDS(here('results/adjusted/H4_adj_res.RDS'))
+#d <- read.csv(paste0(dropboxDir, "Data/Cleaned/Audrie/bangladesh-dm-ee-stress-growth-covariates-stresslab-anthro.csv"))
+d <- readRDS(paste0(dropboxDir,"Data/Cleaned/Andrew/stress_growth_data_clean.RDS"))
+
+#stunting prevalence
+prop.table(table(d$laz_t2 < -2))[2] * 100
+prop.table(table(d$laz_t3 < -2))[2] * 100
+
+
+d <- d %>% mutate(female=ifelse(d$sex=="female", 1, 0), firstborn=ifelse(d$birthord==1, 1, 0))
+table(d$sex)
+table(d$female)
+
+#subset to kids with at least one exposure-outcome pair
+d <- d %>% filter((!is.na(t2_f2_8ip) | !is.na(t2_f2_23d) | !is.na(t2_f2_VI) | !is.na(t2_f2_12i) | !is.na(t2_iso_pca) | 
+                  !is.na(t3_cort_slope) | !is.na(t3_residual_cort) | !is.na(t3_saa_slope) | !is.na(t3_residual_saa) | 
+                  !is.na(t3_map) | !is.na(t3_hr_mean) | !is.na(t3_gcr_mean) | !is.na(t3_gcr_cpg12)) & 
+                  (!is.na(laz_t2) | !is.na(waz_t2) | !is.na(whz_t2) | !is.na(hcz_t2) | 
+                  !is.na(laz_t3) | !is.na(waz_t3) | !is.na(whz_t3) | !is.na(hcz_t3)))
+
+H1 <- readRDS(here('results/unadjusted/H1_res_clean.RDS'))
+H2 <- readRDS(here('results/unadjusted/H2_res_clean.RDS'))
+H3 <- readRDS(here('results/unadjusted/H3_res_clean.RDS'))
+H4 <- readRDS(here('results/unadjusted/H4_res_clean.RDS'))
+H1adj <- readRDS(here('results/adjusted/H1_adj_res_clean.RDS'))
+H2adj <- readRDS(here('results/adjusted/H2_adj_res_clean.RDS'))
+H3adj <- readRDS(here('results/adjusted/H3_adj_res_clean.RDS'))
+H4adj <- readRDS(here('results/adjusted/H4_adj_res_clean.RDS'))
 
 
 #### MAIN TABLES ####
 #### Table 1 ####
 # Characteristics of participants
+N_col <- function(vector){
+  length(vector[!is.na(vector)])
+}
+
 nperc <- function(vector){
   n <- sum(vector==1, na.rm=T)
   perc <- round(n/sum(!is.na(vector))*100)
@@ -29,13 +51,39 @@ mediqr <- function(vector){
   paste(quantiles[3], " (", quantiles[2], ", ", quantiles[4], ")", sep="")
 }
 
-n_med_col <- c(nperc(d$sex), mediqr(d$t2_f2_8ip), mediqr(d$t2_f2_23d), mediqr(d$t2_f2_VI), mediqr(d$t2_f2_12i),
+n_col <- c(N_col(d$female), 
+           N_col(d$t2_f2_8ip), N_col(d$t2_f2_23d), N_col(d$t2_f2_VI), N_col(d$t2_f2_12i),
+               N_col(d$t3_cort_slope), N_col(d$t3_residual_cort), N_col(d$t3_saa_slope), N_col(d$t3_residual_saa),
+               N_col(d$t3_map), N_col(d$t3_hr_mean), N_col(d$t3_gcr_mean), N_col(d$t3_gcr_cpg12),
+               N_col(d$laz_t2), N_col(d$waz_t2), N_col(d$whz_t2), N_col(d$hcz_t2),
+               N_col(d$laz_t3), N_col(d$waz_t3), N_col(d$whz_t3), N_col(d$hcz_t3),
+               N_col(d$diar7d_t2), 
+               N_col(d$diar7d_t3),
+               N_col(d$momage), 
+               N_col(d$momheight), 
+               N_col(d$momeduy),
+               N_col(d$cesd_sum_t2), 
+               N_col(d$cesd_sum_ee_t3), 
+               N_col(d$pss_sum_mom_t3), 
+               N_col(d$life_viol_any_t3))
+
+
+n_med_col <- c(nperc(d$female), 
+               #nperc(d$firstborn), 
+               mediqr(d$t2_f2_8ip),
+               mediqr(d$t2_f2_23d), mediqr(d$t2_f2_VI), mediqr(d$t2_f2_12i),
                mediqr(d$t3_cort_slope), mediqr(d$t3_residual_cort), mediqr(d$t3_saa_slope), mediqr(d$t3_residual_saa),
                mediqr(d$t3_map), mediqr(d$t3_hr_mean), mediqr(d$t3_gcr_mean), mediqr(d$t3_gcr_cpg12),
                mediqr(d$laz_t2), mediqr(d$waz_t2), mediqr(d$whz_t2), mediqr(d$hcz_t2),
                mediqr(d$laz_t3), mediqr(d$waz_t3), mediqr(d$whz_t3), mediqr(d$hcz_t3),
-               nperc(d$diar7d_t2), nperc(d$diar7d_t3), mediqr(d$momage), mediqr(d$momheight), 
-               mediqr(d$momeduy), mediqr(d$cesd_sum_t2), mediqr(d$cesd_sum_ee_t3), mediqr(d$pss_sum_mom_t3), 
+               nperc(d$diar7d_t2), 
+               nperc(d$diar7d_t3),
+               mediqr(d$momage), 
+               mediqr(d$momheight), 
+               mediqr(d$momeduy),
+               mediqr(d$cesd_sum_t2), 
+               mediqr(d$cesd_sum_ee_t3), 
+               mediqr(d$pss_sum_mom_t3), 
                nperc(d$life_viol_any_t3))
 
 tbl1 <- data.table("C1" = c("Child","","","","","","","","","","","","","","","","","","","","","","","Mother","","","","","",""),
@@ -52,18 +100,67 @@ tbl1 <- data.table("C1" = c("Child","","","","","","","","","","","","","","",""
                            "Length-for-age Z score", "Weight-for-age Z score", "Weight-for-length Z score", "Head circumference-for-age Z score",
                            "Caregiver-reported 7-day recall", "Caregiver-reported 7-day recall", "Age (years)", "Height (cm)", "Schooling completed (years)",
                            "CES-D score", "CES-D score", "Perceived Stress Scale score", "Any lifetime exposure"),
-                   "C4" = n_med_col)
+                   "C4" = n_col,
+                   "C5" = n_med_col)
 
 tbl1flex <- flextable(tbl1, col_keys=names(tbl1))
 tbl1flex <- set_header_labels(tbl1flex,
-                        values = list("C1" = "", "C2" = "", "C3" = "", "C4" = "n (%) or median (IQR)"))
+                        values = list("C1" = "", "C2" = "", "C3" = "", "C4" = "N", "C5" = "n (%) or median (IQR)"))
 tbl1flex <- hline_top(tbl1flex, part="header", border=fp_border(color="black", width = 1))
 tbl1flex <- hline_bottom(tbl1flex, part="all", border=fp_border(color="black", width = 1))
 tbl1flex <- autofit(tbl1flex, part = "all")
 tbl1flex <- align(tbl1flex, j = c(1, 2, 3), align = "left", part="all")
 tbl1flex <- align(tbl1flex, j = 4, align = "center", part="all")
 tbl1flex <- fit_to_width(tbl1flex, max_width=8)
-names(tbl1)<- c("","","","n (%) or median (IQR)")
+names(tbl1)<- c("","","","N","n (%) or median (IQR)")
+
+write.csv(tbl1, file=here("tables/main/stress-growth-table1.csv"))
+
+#### Table 2 new ####
+
+tbl2_main <- data.frame(Hypothesis=c("1) Oxidative status is negatively associated with concurrent and future child growth measures, as well as growth velocity between year 1 and year 2.",
+                                     "2) Salivary cortisol measures are positively associated with concurrent child growth measures, and sAA measures are negatively associated with concurrent child growth measures. ",
+                                     "3) SAM biomarker measures are negatively associated with concurrent child growth",
+                                     "4) Glucocorticoid receptor methylation is negatively associated with concurrent child growth measures"),
+                        `Exposure Biological Domain and Biomarkers`=c(
+                          "Oxidative status: Individual urinary F2 isoprostane isomers and combined score at Year 1",
+                          "HPA axis: Cortisol and via concentrations pre-stressor, post-stressor, and reactivity at Year 2\nSAM axis: sAA and via concentrations pre-stressor, post-stressor, and reactivity at Year 2",
+                          "SAM axis: mean arterial pressure and resting heart rate at Year 2",
+                          "HPA axis: Glucocorticoid receptor methylation via percentage methylation at NGFI-A transcription factor binding site and mean overall glucocorticoid receptor methylation at Year 2"),
+                        Outcomes=c("LAZ, WAZ*, HCAZ* score, and WLZ** at year 1, year 2, and the growth velocity between year 1 and 2.",
+                                   rep("LAZ, WAZ*, HCAZ* score, and WLZ** at year 2.",3)),
+                        Finding=c("","","",""))
+
+tbl2flex_main <- flextable(tbl2_main, col_keys=names(tbl2_main))
+tbl2flex_main <- set_header_labels(tbl2flex_main, values = list("V1" = "Hypothesis", "Exposure.Biological.Domain.and.Biomarkers" = "Exposure Biological Domain and Biomarkers", "V3" = "Outcomes", "V4" = "Finding"))
+tbl2flex_main <- hline(tbl2flex_main, part="header", border=fp_border(color="black"))
+tbl2flex_main <- hline_bottom(tbl2flex_main, part="body", border=fp_border(color="black"))
+tbl2flex_main <- hline_top(tbl2flex_main, part="header", border=fp_border(color="black"))
+tbl2flex_main <- align(tbl2flex_main, align = "center", part = "all")
+tbl2flex_main <- align(tbl2flex_main, j = c(1, 2), align = "left", part="all")
+tbl2flex_main <- fontsize(tbl2flex_main, part = "all", size = 7)
+tbl2flex_main <- width(tbl2flex_main, 1:4, width=c(4, 3, 2, 4))
+
+
+
+#### Table 3 new ####
+exposure <- c("t2_f2_8ip", "t2_f2_23d", "t2_f2_VI", "t2_f2_12i", "t2_iso_pca","t3_cort_z01", "t3_cort_z03", "t3_cort_slope", "t3_residual_cort", 
+              "t3_saa_z01", "t3_saa_z02", "t3_saa_slope", "t3_residual_saa","t3_map", "t3_hr_mean","t3_gcr_mean", "t3_gcr_cpg12")
+outcome <- c("laz_t2","laz_t3","len_velocity_t2_t3","delta_laz_t2_t3")
+expo_var <- c("IPF(2a)-III", "2,3-dinor-iPF(2a)-III", "iPF(2a)-VI", "8,12-iso-iPF(2a)-VI", "Combined urinary oxidative stress biomarkers",
+              "Pre-stressor cortisol", "Post-stressor cortisol", "Pre to post-stress change in cortisol", "Cortisol residualized gain score", 
+              "Pre-stressor sAA", "Post-stressor sAA", "Pre to post-stress change in sAA", "sAA residualized gain score",
+              "Mean arterial pressure", "Mean resting heart rate","Entire promoter region (39 assayed CpG sites)", "NGFI-A transcription factor binding site (CpG site #12)")
+out_var <- c("LAZ Year 1", "LAZ Year 2","Length velocity (cm/month) Year 1 to Year 2", "Change in LAZ from Year 1 to Year 2")
+
+tbl3_main <- growth_tbl("", expo_var, out_var, exposure, outcome, 
+                   bind_rows(H1,H2,H3,H4) %>% filter(Y %in% outcome), 
+                   bind_rows(H1adj,H2adj,H3adj,H4adj) %>% filter(Y %in% outcome), T)
+tbl3flex_main <- growth_tbl_flex("", expo_var, out_var, exposure, outcome,
+                            bind_rows(H1,H2,H3,H4) %>% filter(Y %in% outcome), 
+                            bind_rows(H1adj,H2adj,H3adj,H4adj) %>% filter(Y %in% outcome),
+                            T, 1.3, .7)
+
 
 
 #### Table 2 ####
@@ -226,28 +323,38 @@ write.csv(tbl6, here('tables/main/stress-growth-table6.csv'))
 write.csv(tbl7, here('tables/main/stress-growth-table7.csv'))
 write.csv(tbl8, here('tables/main/stress-growth-table8.csv'))
 
-save_as_docx("Table 1" = tbl1flex, 
-             "Table 2" = tbl2flex,
-             "Table 3" = tbl3flex,
-             "Table 4" = tbl4flex, 
-             "Table 5" = tbl5flex, 
-             "Table 6" = tbl6flex, 
-             "Table 7" = tbl7flex, 
-             "Table 8" = tbl8flex, 
-             path='C:/Users/Sophia/Documents/WASH/WASH Stress and Growth/stress-growth main v10.docx',
+save_as_docx("Table 1: Descriptive statistics of sample population" = tbl1flex, 
+             "Table 2: Study exposures, outcomes, and hypothesized relationships" = tbl2flex_main,
+             "Table 3: Associations between child stress measures and linear growth outcomes" = tbl3flex_main,
+              path=paste0(here::here(),"/tables/stress-growth main v11.docx"),
              pr_section = sect_properties)
 
-write.csv(tbl1supp, here('tables/supplementary/stress-growth-tables1.csv'))
-write.csv(tbl2supp, here('tables/supplementary/stress-growth-tables2.csv'))
-write.csv(tbl3supp, here('tables/supplementary/stress-growth-tables3.csv'))
-write.csv(tbl4supp, here('tables/supplementary/stress-growth-tables4.csv'))
-write.csv(tbl5supp, here('tables/supplementary/stress-growth-tables5.csv'))
-write.csv(tbl6supp, here('tables/supplementary/stress-growth-tables6.csv'))
-write.csv(tbl7supp, here('tables/supplementary/stress-growth-tables7.csv'))
-
-
-save_as_docx("Table S1" = tbl1flexsupp, "Table S2" = tbl2flexsupp, "Table S3" = tbl3flexsupp, 
-             "Table S4" = tbl4flexsupp, "Table S5" = tbl5flexsupp, "Table S6" = tbl6flexsupp, "Table S7" = tbl7flexsupp, 
-             path='C:/Users/Sophia/Documents/WASH/WASH Stress and Growth/stress-growth supplementary v10.docx',
+save_as_docx("Table S1: Associations between isoprostanes and growth measures at 14 months" = tbl2flex,
+             "Table S2: Associations between isoprostanes and growth measures at 28 months" = tbl3flex,
+             "Table S3: Associations between isoprostanes and growth velocity measures" = tbl4flex, 
+             "Table S4: Associations between isoprostanes and change in growth Z-score" = tbl5flex, 
+             "Table S5: Associations between salivary biomarkers and growth measures at 28 months" = tbl6flex, 
+             "Table S6: Associations between sympathetic-adreno-medullar biomarkers and growth measures at 28 months" = tbl7flex, 
+             "Table S7: Associations between methylation and growth measures at 28 months" = tbl8flex, 
+             path=paste0(here::here(),"/tables/stress-growth supplementary v11.docx"),
              pr_section = sect_properties)
+
+# write.csv(tbl1supp, here('tables/supplementary/stress-growth-tables1.csv'))
+# write.csv(tbl2supp, here('tables/supplementary/stress-growth-tables2.csv'))
+# write.csv(tbl3supp, here('tables/supplementary/stress-growth-tables3.csv'))
+# write.csv(tbl4supp, here('tables/supplementary/stress-growth-tables4.csv'))
+# write.csv(tbl5supp, here('tables/supplementary/stress-growth-tables5.csv'))
+# write.csv(tbl6supp, here('tables/supplementary/stress-growth-tables6.csv'))
+# write.csv(tbl7supp, here('tables/supplementary/stress-growth-tables7.csv'))
+# 
+# 
+# save_as_docx("Table S1: Comparisons of unadjusted and adjusted associations between isoprostanes and growth measures at 14 months" = tbl1flexsupp,
+#              "Table S2: Comparisons of unadjusted and adjusted associations between isoprostanes and growth measures at 28 months" = tbl2flexsupp,
+#              "Table S3: Comparisons of unadjusted and adjusted associations between isoprostanes and growth velocity measures" = tbl3flexsupp, 
+#              "Table S4: Comparisons of unadjusted and adjusted associations between isoprostanes and change in growth Z-scores" = tbl4flexsupp, 
+#              "Table S5: Comparisons of unadjusted and adjusted associations between salivary biomarkers and growth measures at 28 months" = tbl5flexsupp, 
+#              "Table S6: Comparisons of unadjusted and adjusted associations between sympathetic-adreno-medullar biomarkers and growth measures at 28 months" = tbl6flexsupp, 
+#              "Table S7: Comparisons of unadjusted and adjusted associations between methylation and growth measures at 28 months" = tbl7flexsupp, 
+#              path=paste0(here::here(),"/tables/stress-growth supplementary v10.docx"),
+#              pr_section = sect_properties)
 

@@ -1,0 +1,194 @@
+
+---
+title: "Stress-Growth Figures"
+author: "Andrew Mertens"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+rm(list=ls())
+source(here::here("0-config.R"))
+
+load(paste0(here::here(),"/figures/supplementary/heatmaps.Rdata"))
+
+p_boxplots <- readRDS(file = "C:/Users/andre/Dropbox/WASHB-EE-analysis/WBB-EE-analysis/results/stress-growth-models/figure-objects/boxplot_objects.RDS")
+
+p_consort <- readRDS(paste0(here::here(),"/figures/main/consort_figure1.RDS"))
+p_forest <- readRDS(paste0(here::here(),"/figures/main/forest_plot.RDS"))
+p_spline <- readRDS(paste0(here::here(),"/figures/supplementary/spline_plot.RDS"))
+
+```
+
+## Main figures 
+
+
+
+```{r, echo=F, warning=FALSE, fig.width=10, fig.height=13}
+
+p_consort 
+
+
+```
+
+**Figure 1: Participant enrollment, follow-up, and analysis**
+
+
+```{r, echo=F, warning=FALSE, fig.width=12, fig.height=8}
+
+p_forest
+
+```
+
+**Figure 2: Plots of associations between child stress measures and linear growth measures**
+
+The differences in child linear growth outcomes at the 75th and 25th percentile of each child stress exposure level and its 95% confidence interval after adjusting for pre-specified covariates, estimated using generalized additive models. Panel A shows associations between urinary isoprostanes, measures of oxidative stress, and child linear growth outcomes at and between the year 1 and year 2 child measurements. Panel B shows associations between HPA axis, and SAM axis, and oxidative stress measures and child LAZ at year 2. The x-axis represents the child stress measure, while the y-axis represents the adjusted mean difference in child growth outcome. The color of the points represents the child growth outcome, with LAZ - Year 2 in blue, WAZ - Year 2 in green, and HAZ - Year 2 in red. LAZ: Length-for-age Z-score; WAZ: Weight-for-age Z-score; HCAZ: Head circumference-for-age Z-score; WLZ: Weight-for-length Z-score;  sAA: salivary alpha-amylase.
+
+
+```{r, echo=F, warning=FALSE, fig.width=8, fig.height=5}
+
+p_main_t2
+
+```
+
+
+
+
+**Figure 3: Heatmap of associations between oxidative stress measures and child growth outcomes**
+
+The heatmap shows the adjusted associations between each urinary isoprostane measure of oxidative stress and child growth outcomes at and between year 1 and year 2. Printed in each cell is the GAM-estimated adjusted mean difference in child growth outcome at the 75th and 25th percentile of each exposure distribution, with the cells colored by the magnitude and direction of the estimated P-values. Estimates are annotated with an asterisk (*) if still significant after FDR correction for multiple comparisons. LAZ: Length-for-age Z-score; WAZ: Weight-for-age Z-score; HCAZ: Head circumference-for-age Z-score; WLZ: Weight-for-length Z-score.
+
+```{r, echo=F, warning=FALSE, fig.width=8, fig.height=6}
+
+p_main_t3
+
+```
+
+```{r, echo=F, warning=FALSE, fig.width=9, fig.height=6}
+
+p_main_t3
+
+```
+
+```{r, echo=F, warning=FALSE, fig.width=8, fig.height=5}
+
+p_main_t3
+
+```
+
+**Figure 4: Heatmap of associations between hypothalamic-pituitary-adrenal axis and sympathetic adrenomedullary axis stress measures and child growth outcomes at year 2**
+
+The heatmap shows the adjusted associations between each stress measure and child growth outcome taken at year 2. Printed in each cell is the GAM-estimated adjusted mean difference in child growth outcome at the 75th and 25th percentile of each exposure distribution, with the cells colored by the magnitude and direction of the estimated P-values. Estimates are annotated with an asterisk (*) if still significant after FDR correction for multiple comparisons. LAZ: Length-for-age Z-score; WAZ: Weight-for-age Z-score; HCAZ: Head circumference-for-age Z-score; WLZ: Weight-for-length Z-score; sAA: salivary alpha-amylase.
+
+
+
+
+## Supplimentary figures 
+
+```{r, echo=F, warning=FALSE, fig.width=6, fig.height=6}
+
+p_sens_t2 
+
+
+```
+
+**Figure SX: Heatmap of associations between oxidative stress measures and child growth outcomes estimated without adjusting for prior growth measures**
+
+The heatmap shows the associations between each urinary isoprostane measure of oxidative stress and child growth outcomes at and between year 1 and year 2 when estimated without adjusting for prior child growth. Printed in each cell is the GAM-estimated adjusted mean difference in child growth outcome at the 75th and 25th percentile of each exposure distribution, with the cells colored by the magnitude and direction of the estimated P-values. Estimates are annotated with an asterisk (*) if still significant after FDR correction for multiple comparisons. 
+
+
+
+```{r, echo=F, warning=FALSE, fig.width=6, fig.height=4}
+
+p_sens_t3
+
+```
+
+**Figure SX: Heatmap of associations between hypothalamic-pituitary-adrenal axis and sympathetic adrenomedullary axis stress and child growth outcomes estimated without adjusting for prior growth measures**
+
+
+The heatmap shows the adjusted associations between each stress measure and child growth outcome taken at year 2 when estimated without adjusting for prior child growth. Printed in each cell is the GAM-estimated adjusted mean difference in child growth outcome at the 75th and 25th percentile of each exposure distribution, with the cells colored by the magnitude and direction of the estimated P-values. Estimates are annotated with an asterisk (*) if still significant after FDR correction for multiple comparisons. 
+
+
+
+```{r, echo=F, warning=FALSE, fig.width=6, fig.height=4}
+
+p_growth_t2
+
+```
+
+
+**Figure SX: Heatmap of associations between prior and concurrent child growth and oxidative stress measures as outcomes**
+
+
+The heatmap shows the associations between prior growth measures as exposures and urinary isoprostane measure of oxidative stress at year 1 as outcomes. Printed in each cell is the GAM-estimated adjusted mean difference in child growth outcome at the 75th and 25th percentile of each exposure distribution, with the cells colored by the magnitude and direction of the estimated P-values. Estimates are annotated with an asterisk (*) if still significant after FDR correction for multiple comparisons. 
+
+
+
+
+
+
+
+
+```{r, echo=F, warning=FALSE, fig.width=6, fig.height=6}
+
+p_growth_t3
+
+
+```
+
+
+**Figure SX: Heatmap of associations between prior and concurrent child growth and HPA and SAM axis stress measures as outcomes**
+
+The heatmap shows the associations between prior growth measures as exposures and year 2 measures of child stress as outcomes. Printed in each cell is the GAM-estimated adjusted mean difference in child growth outcome at the 75th and 25th percentile of each exposure distribution, with the cells colored by the magnitude and direction of the estimated P-values. Estimates are annotated with an asterisk (*) if still significant after FDR correction for multiple comparisons. 
+
+
+
+
+```{r, echo=F, warning=FALSE, fig.width=6, fig.height=6}
+
+p_unadj_t2 
+
+
+```
+
+**Figure SX: Heatmap of unadjusted associations between oxidative stress measures and child growth outcomes**
+
+The heatmap shows the unadjusted associations between each stress measure and child growth outcome taken at year 2. Printed in each cell is the GAM-estimated adjusted mean difference in child growth outcome at the 75th and 25th percentile of each exposure distribution, with the cells colored by the magnitude and direction of the estimated P-values. Estimates are annotated with an asterisk (*) if still significant after FDR correction for multiple comparisons. 
+
+
+
+```{r, echo=F, warning=FALSE, fig.width=6, fig.height=4}
+
+p_unadj_t3
+
+```
+
+**Figure SX: Heatmap of unadjusted associations between HPA and SAM axis stress measures and child growth outcomes**
+
+The heatmap shows the unadjusted associations between each stress measure and child growth outcome taken at year 2. Printed in each cell is the GAM-estimated adjusted mean difference in child growth outcome at the 75th and 25th percentile of each exposure distribution, with the cells colored by the magnitude and direction of the estimated P-values. Estimates are annotated with an asterisk (*) if still significant after FDR correction for multiple comparisons. 
+
+
+
+<!-- # ```{r, echo=F, warning=FALSE, fig.width=6, fig.height=4} -->
+<!-- #  -->
+<!-- #  -->
+<!-- # p_boxplots -->
+<!-- #  -->
+<!-- # ``` -->
+<!-- #  -->
+<!-- #  -->
+<!-- # **Figure SX: Boxplots of isoprostane concentrations by category of Z-score.** -->
+<!-- #  -->
+<!-- # NOTE! Consider quantiling isoprostanes and then showing Z-score differences for more matched scales -->
+
+
+
+```{r, echo=F, warning=FALSE, fig.width=6, fig.height=4}
+
+
+p_spline
+
+```
+
+**Figure SX: Spline curves of the associations between concurrent urinary F2 isoprostanes and child LAZ at Year 1.**
+

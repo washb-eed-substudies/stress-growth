@@ -2,7 +2,8 @@ rm(list=ls())
  
 source(here::here("0-config.R"))
 
-d<-readRDS(paste0(dropboxDir, "Data/Cleaned/Andrew/stress_growth_data.RDS"))
+
+d <- readRDS(paste0(dropboxDir,"Data/Cleaned/Andrew/stress_growth_data_clean.RDS"))
 
 #Example:
 
@@ -87,15 +88,15 @@ for(i in 1:nrow(H1_models)){
   H1_res <-  bind_rows(H1_res , preds$res)
 }
 
-#Make list of plots
-H1_plot_list <- NULL
-H1_plot_data <- NULL
-for(i in 1:nrow(H1_models)){
-  res <- data.frame(X=H1_models$X[i], Y=H1_models$Y[i])
-  simul_plot <- gam_simul_CI(H1_models$fit[i][[1]], H1_models$dat[i][[1]], xlab=res$X, ylab=res$Y, title="")
-  H1_plot_list[[i]] <-  simul_plot$p
-  H1_plot_data <-  rbind(H1_plot_data, data.frame(Xvar=res$X, Yvar=res$Y, adj=0, simul_plot$pred))
-}
+# #Make list of plots
+# H1_plot_list <- NULL
+# H1_plot_data <- NULL
+# for(i in 1:nrow(H1_models)){
+#   res <- data.frame(X=H1_models$X[i], Y=H1_models$Y[i])
+#   simul_plot <- gam_simul_CI(H1_models$fit[i][[1]], H1_models$dat[i][[1]], xlab=res$X, ylab=res$Y, title="")
+#   H1_plot_list[[i]] <-  simul_plot$p
+#   H1_plot_data <-  rbind(H1_plot_data, data.frame(Xvar=res$X, Yvar=res$Y, adj=0, simul_plot$pred))
+# }
 
 
 #Save models
@@ -109,7 +110,7 @@ saveRDS(H1_res, here("results/unadjusted/H1_res.RDS"))
 #saveRDS(H1_plot_list, here("figure-objects/H1_unadj_splines.RDS"))
 
 #Save plot data
-saveRDS(H1_plot_data, here("figure-data/H1_unadj_spline_data.RDS"))
+#saveRDS(H1_plot_data, here("figure-data/H1_unadj_spline_data.RDS"))
 
 
 
@@ -171,15 +172,15 @@ for(i in 1:nrow(H2_models)){
   H2_res <-  bind_rows(H2_res , preds$res)
 }
 
-#Make list of plots
-H2_plot_list <- NULL
-H2_plot_data <- NULL
-for(i in 1:nrow(H2_models)){
-  res <- data.frame(X=H2_models$X[i], Y=H2_models$Y[i])
-  simul_plot <- gam_simul_CI(H2_models$fit[i][[1]], H2_models$dat[i][[1]], xlab=res$X, ylab=res$Y, title="")
-  H2_plot_list[[i]] <-  simul_plot$p
-  H2_plot_data <-  rbind(H2_plot_data, data.frame(Xvar=res$X, Yvar=res$Y, adj=0, simul_plot$pred))
-}
+# #Make list of plots
+# H2_plot_list <- NULL
+# H2_plot_data <- NULL
+# for(i in 1:nrow(H2_models)){
+#   res <- data.frame(X=H2_models$X[i], Y=H2_models$Y[i])
+#   simul_plot <- gam_simul_CI(H2_models$fit[i][[1]], H2_models$dat[i][[1]], xlab=res$X, ylab=res$Y, title="")
+#   H2_plot_list[[i]] <-  simul_plot$p
+#   H2_plot_data <-  rbind(H2_plot_data, data.frame(Xvar=res$X, Yvar=res$Y, adj=0, simul_plot$pred))
+# }
 
 
 #Save models
@@ -193,7 +194,7 @@ saveRDS(H2_res, here("results/unadjusted/H2_res.RDS"))
 #saveRDS(H2_plot_list, here("figure-objects/H2_unadj_splines.RDS"))
 
 #Save plot data
-saveRDS(H2_plot_data, here("figure-data/H2_unadj_spline_data.RDS"))
+#saveRDS(H2_plot_data, here("figure-data/H2_unadj_spline_data.RDS"))
 
 
 
@@ -236,15 +237,15 @@ for(i in 1:nrow(H3_models)){
   H3_res <-  bind_rows(H3_res , preds$res)
 }
 
-#Make list of plots
-H3_plot_list <- NULL
-H3_plot_data <- NULL
-for(i in 1:nrow(H3_models)){
-  res <- data.frame(X=H3_models$X[i], Y=H3_models$Y[i])
-  simul_plot <- gam_simul_CI(H3_models$fit[i][[1]], H3_models$dat[i][[1]], xlab=res$X, ylab=res$Y, title="")
-  H3_plot_list[[i]] <-  simul_plot$p
-  H3_plot_data <-  rbind(H3_plot_data, data.frame(Xvar=res$X, Yvar=res$Y, adj=0, simul_plot$pred))
-}
+# #Make list of plots
+# H3_plot_list <- NULL
+# H3_plot_data <- NULL
+# for(i in 1:nrow(H3_models)){
+#   res <- data.frame(X=H3_models$X[i], Y=H3_models$Y[i])
+#   simul_plot <- gam_simul_CI(H3_models$fit[i][[1]], H3_models$dat[i][[1]], xlab=res$X, ylab=res$Y, title="")
+#   H3_plot_list[[i]] <-  simul_plot$p
+#   H3_plot_data <-  rbind(H3_plot_data, data.frame(Xvar=res$X, Yvar=res$Y, adj=0, simul_plot$pred))
+# }
 
 
 #Save models
@@ -257,8 +258,8 @@ saveRDS(H3_res, here("results/unadjusted/H3_res.RDS"))
 #Save plots
 #saveRDS(H3_plot_list, here("figure-objects/H3_unadj_splines.RDS"))
 
-#Save plot data
-saveRDS(H3_plot_data, here("figure-data/H3_unadj_spline_data.RDS"))
+# #Save plot data
+# saveRDS(H3_plot_data, here("figure-data/H3_unadj_spline_data.RDS"))
 
 
 ##Hypothesis 4a
@@ -300,15 +301,15 @@ for(i in 1:nrow(H4_models)){
   H4_res <-  bind_rows(H4_res , preds$res)
 }
 
-#Make list of plots
-H4_plot_list <- NULL
-H4_plot_data <- NULL
-for(i in 1:nrow(H4_models)){
-  res <- data.frame(X=H4_models$X[i], Y=H4_models$Y[i])
-  simul_plot <- gam_simul_CI(H4_models$fit[i][[1]], H4_models$dat[i][[1]], xlab=res$X, ylab=res$Y, title="")
-  H4_plot_list[[i]] <-  simul_plot$p
-  H4_plot_data <-  rbind(H4_plot_data, data.frame(Xvar=res$X, Yvar=res$Y, adj=0, simul_plot$pred))
-}
+# #Make list of plots
+# H4_plot_list <- NULL
+# H4_plot_data <- NULL
+# for(i in 1:nrow(H4_models)){
+#   res <- data.frame(X=H4_models$X[i], Y=H4_models$Y[i])
+#   simul_plot <- gam_simul_CI(H4_models$fit[i][[1]], H4_models$dat[i][[1]], xlab=res$X, ylab=res$Y, title="")
+#   H4_plot_list[[i]] <-  simul_plot$p
+#   H4_plot_data <-  rbind(H4_plot_data, data.frame(Xvar=res$X, Yvar=res$Y, adj=0, simul_plot$pred))
+# }
 
 
 #Save models
@@ -321,6 +322,6 @@ saveRDS(H4_res, here("results/unadjusted/H4_res.RDS"))
 #Save plots
 #saveRDS(H4_plot_list, here("figure-objects/H4_unadj_splines.RDS"))
 
-#Save plot data
-saveRDS(H4_plot_data, here("figure-data/H4_unadj_spline_data.RDS"))
+# #Save plot data
+# saveRDS(H4_plot_data, here("figure-data/H4_unadj_spline_data.RDS"))
 
