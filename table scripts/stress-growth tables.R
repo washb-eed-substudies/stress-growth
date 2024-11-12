@@ -3,6 +3,18 @@ rm(list=ls())
 source(here::here("0-config.R"))
 source(here::here("table scripts/table-functions.R"))
 
+#load results
+H1 <- readRDS(here('results/unadjusted/H1_res_clean.RDS'))
+H2 <- readRDS(here('results/unadjusted/H2_res_clean.RDS'))
+H3 <- readRDS(here('results/unadjusted/H3_res_clean.RDS'))
+H4 <- readRDS(here('results/unadjusted/H4_res_clean.RDS'))
+H1adj <- readRDS(here('results/adjusted/H1_adj_res_clean.RDS'))
+H2adj <- readRDS(here('results/adjusted/H2_adj_res_clean.RDS'))
+H3adj <- readRDS(here('results/adjusted/H3_adj_res_clean.RDS'))
+H4adj <- readRDS(here('results/adjusted/H4_adj_res_clean.RDS'))
+
+
+
 # load enrollment characteristics and results
 #d <- read.csv(paste0(dropboxDir, "Data/Cleaned/Audrie/bangladesh-dm-ee-stress-growth-covariates-stresslab-anthro.csv"))
 d <- readRDS(paste0(dropboxDir,"Data/Cleaned/Andrew/stress_growth_data_clean.RDS"))
@@ -22,15 +34,6 @@ d <- d %>% filter((!is.na(t2_f2_8ip) | !is.na(t2_f2_23d) | !is.na(t2_f2_VI) | !i
                   !is.na(t3_map) | !is.na(t3_hr_mean) | !is.na(t3_gcr_mean) | !is.na(t3_gcr_cpg12)) & 
                   (!is.na(laz_t2) | !is.na(waz_t2) | !is.na(whz_t2) | !is.na(hcz_t2) | 
                   !is.na(laz_t3) | !is.na(waz_t3) | !is.na(whz_t3) | !is.na(hcz_t3)))
-
-H1 <- readRDS(here('results/unadjusted/H1_res_clean.RDS'))
-H2 <- readRDS(here('results/unadjusted/H2_res_clean.RDS'))
-H3 <- readRDS(here('results/unadjusted/H3_res_clean.RDS'))
-H4 <- readRDS(here('results/unadjusted/H4_res_clean.RDS'))
-H1adj <- readRDS(here('results/adjusted/H1_adj_res_clean.RDS'))
-H2adj <- readRDS(here('results/adjusted/H2_adj_res_clean.RDS'))
-H3adj <- readRDS(here('results/adjusted/H3_adj_res_clean.RDS'))
-H4adj <- readRDS(here('results/adjusted/H4_adj_res_clean.RDS'))
 
 
 #### MAIN TABLES ####
